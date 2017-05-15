@@ -1,0 +1,17 @@
+page-login {
+  .item-block .item-inner {
+    border-bottom: none !important;
+
+    .label {
+      color: black;
+    }
+  }
+
+  ion-checkbox {
+    margin: 9px 06px 13px 4px !important;
+  }
+
+  .remember-item {
+    padding-left: 0 !important;
+  }
+}
