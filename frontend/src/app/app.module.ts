@@ -6,21 +6,20 @@ import { MyApp } from './app.component';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import {WelcomePage} from "../pages/welcome/welcome";
 
 @NgModule({
   declarations: [
-    MyApp,
-    WelcomePage
+    MyApp
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp),
+    IonicModule.forRoot(MyApp, {
+      locationStrategy: 'path'
+    }),
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp,
-    WelcomePage
+    MyApp
   ],
   providers: [
     StatusBar,

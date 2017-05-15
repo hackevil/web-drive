@@ -1,5 +1,44 @@
 page-main {
-  ion-menu {
-    max-width: 200px!important;
+  ion-title .toolbar-title {
+    text-align: center;
   }
+
+  @media only screen and (min-width: 992px) {
+    ion-menu {
+      max-width: 280px!important;
+    }
+  }
+
+  ion-menu ion-content {
+    background-color: white !important;
+  }
+
+  ion-label.label {
+    margin-bottom: 5px !important;
+    color: black !important;
+    text-align: left !important;
+  }
+
+  #usage-wrapper {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    width: 260px;
+  }
+
+  #usage-wrapper span {
+    font-size: 10px;
+  }
+
+  #usage-wrapper #usage-container {
+    height: 5px;
+    border: 1px solid black;
+  }
+
+  #usage-wrapper #usage-container #usage {
+    height: 100%;
+    width: 10%;
+    background-color: greenyellow;
+  }
+
 }
