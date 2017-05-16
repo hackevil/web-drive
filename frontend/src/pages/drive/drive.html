@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar>
     <button ion-button menuToggle>
-    <ion-icon name="menu"></ion-icon>
+      <ion-icon name="menu"></ion-icon>
     </button>
     <ion-searchbar>
     </ion-searchbar>
@@ -11,4 +11,89 @@
 
 <ion-content padding>
 
+  <div class="row drive-title folders">
+    <div class="col-xs-12" >
+      <div class="panel panel-default" style="border-radius: 0">
+        <div class="panel-heading">Folders</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
+      <div class="panel panel-default">
+        <div class="panel-heading text-center folder-header"><i class="fa fa-folder-open-o fa-5x"></i></div>
+        <div class="panel-body text-muted folder-title truncate">
+          Test Folder
+        </div>
+      </div>
+    </div>
+    <div class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
+      <div class="panel panel-default">
+        <div class="panel-heading text-center folder-header"><i class="fa fa-folder-open-o fa-5x"></i></div>
+        <div class="panel-body text-muted folder-title truncate">
+          Test Folder
+        </div>
+      </div>
+    </div>
+    <div class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
+      <div class="panel panel-default">
+        <div class="panel-heading text-center folder-header"><i class="fa fa-folder-open-o fa-5x"></i></div>
+        <div class="panel-body text-muted folder-title truncate">
+          Test Folder
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row drive-title files">
+    <div class="col-xs-12">
+      <div class="panel panel-default" style="border-radius: 0">
+        <div class="panel-heading">Files</div>
+      </div>
+    </div>
+  </div>
+
+  <h5 hideWhen="android,ios" class="text-center text-muted">Drag Files here to upload.</h5>
+
 </ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <span hideWhen="android,ios">
+      <button ion-button icon-left clear>
+        <ion-icon name="share" aria-label="share"></ion-icon>
+        Share
+      </button>
+
+      <button ion-button icon-left clear>
+        <ion-icon name="cloud-download" aria-label="download"></ion-icon>
+        Download
+      </button>
+
+      <button ion-button icon-left clear>
+        <ion-icon name="trash" aria-label="delete"></ion-icon>
+        Delete
+      </button>
+
+      <button ion-button icon-left clear>
+        <ion-icon name="create" aria-label="rename"></ion-icon>
+        Rename
+      </button>
+    </span>
+
+    <button ion-button icon-only clear (click)="presentPopover($event)">
+      <ion-icon name="more"></ion-icon>
+    </button>
+
+    <button class="pull-right" ion-button icon-right clear end>
+      <ion-icon name="close" aria-label="unselect"></ion-icon>
+      2 Selected
+    </button>
+
+  </ion-toolbar>
+</ion-footer>
+
+
+
+

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {IonicPage, NavController, NavParams} from 'ionic-angular';
+import {IonicPage, NavController, NavParams, PopoverController} from 'ionic-angular';
 
 @IonicPage()
 @Component({
@@ -8,11 +8,18 @@ import {IonicPage, NavController, NavParams} from 'ionic-angular';
 })
 export class DrivePage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private popoverCtrl: PopoverController) {
+  }
+
+  presentPopover(myEvent) {
+    let popover = this.popoverCtrl.create("PopoverOptionsPage");
+    popover.present({
+      ev: myEvent
+    });
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad LoginPage');
+    console.log('ionViewDidLoad DrivePage');
   }
 
 }

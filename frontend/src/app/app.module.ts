@@ -13,9 +13,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp, {
-      locationStrategy: 'path'
-    }),
+    IonicModule.forRoot(MyApp),
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -28,3 +26,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   ]
 })
 export class AppModule {}
+
+
+// {
+//   locationStrategy: 'path'
+// }
