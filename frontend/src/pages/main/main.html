@@ -11,27 +11,30 @@
       </ion-header>
       <ion-content>
         <ion-list>
-          <button ion-item>
+          <button (click)="goToFiles()" ion-item>
             <ion-icon name="document" item-left></ion-icon>My Files
+            <ion-icon *ngIf="data.state === 5" name="star-half" item-right></ion-icon>
           </button>
           <button ion-item>
             <ion-icon name="share" item-left></ion-icon>Shared
+            <ion-icon *ngIf="data.state === 10" name="star-half" item-right></ion-icon>
           </button>
-          <button ion-item>
+          <button (click)="goToTrash()" ion-item>
             <ion-icon name="trash" item-left></ion-icon>Trash
+            <ion-icon *ngIf="data.state === 15" name="star-half" item-right></ion-icon>
           </button>
           <button ion-item>
             <ion-icon name="cloud-upload" item-left></ion-icon>Upload
           </button>
-          <button ion-item>
+          <button (click)="logout()" ion-item>
             <ion-icon name="exit" item-left></ion-icon>Logout
           </button>
         </ion-list>
 
         <div id="usage-wrapper">
-          <span>1GB out of 10GB used. (10%)</span>
+          <span>{{currentUser.usage}}GB out of 10GB used. ({{currentUser.usagePercent}}%)</span>
           <div id="usage-container">
-            <div id="usage"></div>
+            <div id="usage" [style.width.%]="currentUser.usagePercent"></div>
           </div>
         </div>
 

@@ -3,7 +3,7 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-searchbar>
+    <ion-searchbar [(ngModel)]="searchText">
     </ion-searchbar>
   </ion-navbar>
 </ion-header>
@@ -14,33 +14,27 @@
   <div class="row drive-title folders">
     <div class="col-xs-12" >
       <div class="panel panel-default" style="border-radius: 0">
-        <div class="panel-heading">Folders</div>
+        <div class="panel-heading">
+          <ion-icon style="cursor:pointer; padding-right: 10px;"
+                    *ngIf="data.folderLevels.length > 0" icon-left name="arrow-dropleft-circle"
+                    (click)="exitFolder()"></ion-icon> Folders
+        </div>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <div class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
+    <div *ngFor="let folder of currentFolder.folders | myFilter:searchText:data.state" class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
       <div class="panel panel-default">
-        <div class="panel-heading text-center folder-header"><i class="fa fa-folder-open-o fa-5x"></i></div>
-        <div class="panel-body text-muted folder-title truncate">
-          Test Folder
+        <div class="panel-heading text-center folder-header">
+          <ion-checkbox class="item-checkbox"
+                        [checked]="selected.has(folder.id)"
+                        (click)="updateSelectedItems(folder.id)">
+          </ion-checkbox>
+          <ion-icon name="briefcase" class="fa-5x"></ion-icon>
         </div>
-      </div>
-    </div>
-    <div class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
-      <div class="panel panel-default">
-        <div class="panel-heading text-center folder-header"><i class="fa fa-folder-open-o fa-5x"></i></div>
-        <div class="panel-body text-muted folder-title truncate">
-          Test Folder
-        </div>
-      </div>
-    </div>
-    <div class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
-      <div class="panel panel-default">
-        <div class="panel-heading text-center folder-header"><i class="fa fa-folder-open-o fa-5x"></i></div>
-        <div class="panel-body text-muted folder-title truncate">
-          Test Folder
+        <div class="panel-body text-muted folder-title truncate" (click)="enterFolder(folder.parent, folder.id)">
+          {{folder.name}}
         </div>
       </div>
     </div>
@@ -54,41 +48,69 @@
     </div>
   </div>
 
+  <div class="row">
+    <div *ngFor="let file of currentFolder.files | myFilter:searchText:data.state" class="file col-lg-2 col-md-4 col-sm-6 col-xs-12">
+      <div class="panel panel-default">
+        <div class="panel-heading text-center file-header">
+          <ion-checkbox class="item-checkbox"
+                        [checked]="selected.has(file.id)"
+                        (click)="updateSelectedItems(file.id)">
+          </ion-checkbox>
+          <ion-icon name="document" class="fa-5x"></ion-icon>
+        </div>
+        <div class="panel-body text-muted file-title truncate">
+          {{file.name}}
+        </div>
+      </div>
+    </div>
+  </div>
+
   <h5 hideWhen="android,ios" class="text-center text-muted">Drag Files here to upload.</h5>
 
 </ion-content>
 
 <ion-footer>
   <ion-toolbar>
-    <span hideWhen="android,ios">
-      <button ion-button icon-left clear>
+    <span class="hide-on-small" hideWhen="android,ios">
+      <button *ngIf="selected.size > 0"
+              ion-button icon-left clear
+              (click)="shareItems()">
         <ion-icon name="share" aria-label="share"></ion-icon>
         Share
       </button>
 
-      <button ion-button icon-left clear>
+      <button *ngIf="selected.size > 0"
+              ion-button icon-left clear
+              (click)="downloadItems()">
         <ion-icon name="cloud-download" aria-label="download"></ion-icon>
         Download
       </button>
 
-      <button ion-button icon-left clear>
+      <button *ngIf="selected.size > 0"
+              ion-button icon-left clear
+              (click)="deleteItems()">
         <ion-icon name="trash" aria-label="delete"></ion-icon>
         Delete
       </button>
 
-      <button ion-button icon-left clear>
+      <button *ngIf="selected.size === 1"
+              ion-button icon-left clear
+              (click)="renameItem()">
         <ion-icon name="create" aria-label="rename"></ion-icon>
         Rename
       </button>
     </span>
 
-    <button ion-button icon-only clear (click)="presentPopover($event)">
+    <button *ngIf="selected.size > 0" class="hide-on-large"
+            ion-button icon-only clear (click)="presentPopover($event)">
       <ion-icon name="more"></ion-icon>
     </button>
 
-    <button class="pull-right" ion-button icon-right clear end>
+    <button *ngIf="selected.size > 0" class="pull-right"
+            ion-button icon-right clear end
+            (click)="clearSelected()">
       <ion-icon name="close" aria-label="unselect"></ion-icon>
-      2 Selected
+      {{selected.size}} Selected
     </button>
 
   </ion-toolbar>

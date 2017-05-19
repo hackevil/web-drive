@@ -23,7 +23,7 @@ page-main {
     position: fixed;
     bottom: 10px;
     left: 10px;
-    width: 260px;
+    width: 240px;
   }
 
   #usage-wrapper span {
@@ -37,8 +37,14 @@ page-main {
 
   #usage-wrapper #usage-container #usage {
     height: 100%;
-    width: 10%;
+    width: 0%;
     background-color: greenyellow;
+  }
+
+  @media only screen and (max-width: 750px) {
+    #usage-wrapper {
+      width: 280px;
+    }
   }
 
 }

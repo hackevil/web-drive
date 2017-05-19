@@ -27,6 +27,34 @@ page-drive {
     &.folders .panel-default > .panel-heading {
       border-bottom: 2px solid #2b85e2 !important;
     }
+  }
 
+  .truncate {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .folder, .file {
+    .panel {
+      border-radius: 2px;
+    }
+    .panel-heading {
+      padding: 10px 10px !important;
+    }
+    .folder-title, .file-title {
+      padding: 8px;
+      background-color: rgba(0, 0, 0, 0.1);
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.66);
+    }
+    .folder-title {
+      cursor: pointer;
+    }
+    .item-checkbox {
+      float:right;
+      margin-top: 0;
+    }
   }
 }

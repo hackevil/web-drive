@@ -10,20 +10,24 @@ import { AuthServiceProvider } from '../providers/auth-service/auth-service';
 import { ConnectionServiceProvider } from '../providers/connection-service/connection-service';
 import { DataServiceProvider } from '../providers/data-service/data-service';
 import { IonicStorageModule } from '@ionic/storage';
+import { RenameModalComponent } from '../components/rename-modal/rename-modal';
+import {HttpModule} from "@angular/http";
 
 
 @NgModule({
   declarations: [
-    MyApp
+    MyApp,
+    RenameModalComponent
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    IonicStorageModule.forRoot()
+    IonicStorageModule.forRoot(),
+    HttpModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp
+    MyApp, RenameModalComponent
   ],
   providers: [
     StatusBar,

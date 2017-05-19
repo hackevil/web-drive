@@ -47,3 +47,19 @@ ion-card > .panel-heading {
   background-color: #fff;
   border-color: #d3e0e9;
 }
+
+ion-backdrop {
+  opacity: 0.3 !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .hide-on-small {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .hide-on-large {
+    display: none !important;
+  }
+}

@@ -3,9 +3,10 @@ import 'rxjs/add/operator/map';
 import {ConnectionServiceProvider} from "../connection-service/connection-service";
 import {Observable} from 'rxjs/Observable';
 
-class User {
+export class User {
   private _name: string;
   private _email: string;
+  public usage: number = 2;
 
   constructor(name: string, email: string) {
     this._name = name;
@@ -19,6 +20,10 @@ class User {
   get email() {
     return this._email;
   }
+
+  get usagePercent() {
+    return (this.usage / 10) * 100;
+  }
 }
 
 interface Credentials {
@@ -31,7 +36,9 @@ export class AuthServiceProvider {
 
   private authUser: User = null;
 
-  constructor(private connection: ConnectionServiceProvider) {}
+  constructor(private connection: ConnectionServiceProvider) {
+    this.authUser = new User("michael", "michael-henderson@live.com.au");
+  }
 
   public login(credentials: Credentials): Observable<boolean> {
     return Observable.create(observer => {
@@ -51,20 +58,8 @@ export class AuthServiceProvider {
     observer.complete()
   }
 
-  public logout(): Observable<boolean> {
-    return Observable.create(observer => {
-      this.connection.notify("logout").subscribe(
-        result => this.handleLogoutResponse(result, observer),
-        error => {observer.next(false); observer.complete()}
-      );
-    });
-  }
-
-  private handleLogoutResponse(result, observer) {
-    console.log(result);
+  public logout() {
     this.connection.clearAuthToken();
-    observer.next(true);
-    observer.complete();
   }
 
   public register(details) {
