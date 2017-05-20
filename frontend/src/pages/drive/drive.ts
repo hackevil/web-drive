@@ -11,40 +11,27 @@ import {AuthServiceProvider, User} from "../../providers/auth-service/auth-servi
 export class DrivePage {
 
   private currentFolder;
+  private selected;
   private currentUser: User;
-  private selected: Set<string> = new Set();
   public searchText = "";
 
   constructor(private popoverCtrl: PopoverController, private data: DataServiceProvider,
               private alertCtrl: AlertController, private auth: AuthServiceProvider) {
     this.currentFolder = this.data.currentFolder;
     this.currentUser = this.auth.getAuthenticatedUser();
+    this.selected = this.data.selected;
   }
 
   updateSelectedItems(id) {
     (this.selected.has(id) === false) ? this.selected.add(id) : this.selected.delete(id);
   }
 
-  enterFolder(parentId: string, folderId: string) {
-    if (this.data.folders.has(folderId)) {
-      const newFolder = this.data.folders.get(folderId);
-      this.setCurrentFolder(newFolder);
-      this.data.folderLevels.push(parentId);
-    }
+  enterFolder(parentId: number, folderId: number) {
+    this.data.enterFolder(folderId, parentId);
   }
 
   exitFolder() {
-    this.selected.clear();
-    const parentId = this.data.folderLevels.pop();
-    const newFolder = this.data.folders.get(parentId);
-    this.setCurrentFolder(newFolder);
-  }
-
-  private setCurrentFolder(newFolder) {
-    this.selected.clear();
-    this.data.currentFolder.folders = newFolder.folders;
-    this.data.currentFolder.files = newFolder.files;
-
+    this.data.exitFolder();
   }
 
   renameItem() {
@@ -117,8 +104,8 @@ export class DrivePage {
     });
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad DrivePage');
-  }
+  // ionViewCanEnter(): Promise<boolean> {
+  //   return this.auth.isAuthenticated();
+  // }
 
 }

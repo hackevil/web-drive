@@ -15,7 +15,7 @@ export class FilterPipe implements PipeTransform {
     return items.filter(item =>  {
       const lowercaseItem = item.name ? item.name.toLowerCase() : "";
       return (lowercaseItem.includes(lowercaseFilter) &&
-        (!item.deleted && !keepDeleted) || (item.deleted === keepDeleted))
+        ((!item.deleted_at && !keepDeleted) || ((!!item.deleted_at) === keepDeleted)));
     });
   }
 }

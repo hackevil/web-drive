@@ -13,39 +13,51 @@
           <div class="panel-body">
             <form class="form-horizontal" (ngSubmit)="register()" #registerForm="ngForm">
 
-              <div class="form-group">
+              <div class="form-group {{ errors.has('name') ? ' has-error' : '' }}">
                 <label for="name" class="col-md-4 control-label">Name</label>
 
                 <div class="col-md-6">
-                  <input id="name" [(ngModel)]="user.name" type="text"
+                  <input id="name" [(ngModel)]="registration.name" type="text"
                          class="form-control" name="name" required autofocus>
+                  <span *ngIf="errors.has('name')" class="help-block">
+                    <strong>{{ errors.get('name') }}</strong>
+                  </span>
                 </div>
               </div>
 
-              <div class="form-group">
+              <div class="form-group {{ errors.has('email') ? ' has-error' : '' }}">
                 <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
                 <div class="col-md-6">
-                  <input id="email" [(ngModel)]="user.email" type="email"
+                  <input id="email" [(ngModel)]="registration.email" type="email"
                          class="form-control" name="email" required>
+                  <span *ngIf="errors.has('email')" class="help-block">
+                    <strong>{{ errors.get('email') }}</strong>
+                  </span>
                 </div>
               </div>
 
-              <div class="form-group">
+              <div class="form-group {{ errors.has('password') ? ' has-error' : '' }}">
                 <label for="password" class="col-md-4 control-label">Password</label>
 
                 <div class="col-md-6">
-                  <input id="password" [(ngModel)]="user.password"
+                  <input id="password" [(ngModel)]="registration.password"
                          type="password" class="form-control" name="password" required>
+                  <span *ngIf="errors.has('password')" class="help-block">
+                    <strong>{{ errors.get('password') }}</strong>
+                  </span>
                 </div>
               </div>
 
-              <div class="form-group">
+              <div class="form-group {{ errors.has('confirmation') ? ' has-error' : '' }}">
                 <label for="confirm-password" class="col-md-4 control-label">Confirm Password</label>
 
                 <div class="col-md-6">
-                  <input id="confirm-password" [(ngModel)]="user.confirm"
+                  <input id="confirm-password" [(ngModel)]="registration.password_confirmation"
                          type="password" class="form-control" name="confirm-password" required>
+                  <span *ngIf="errors.has('confirmation')" class="help-block">
+                    <strong>{{ errors.get('confirmation') }}</strong>
+                  </span>
                 </div>
               </div>
 

@@ -15,7 +15,7 @@ export class MainPage {
   private currentUser: User;
 
   constructor(private auth: AuthServiceProvider, private data: DataServiceProvider,
-              public navCtrl: NavController, ) {
+              public navCtrl: NavController) {
     this.activePage = "DrivePage";
     this.currentUser = this.auth.getAuthenticatedUser();
     this.goToFiles();
@@ -23,12 +23,12 @@ export class MainPage {
 
   goToTrash() {
     this.data.state = PageState.DELETED;
-    //TODO: clear selected
+    this.data.selected.clear();
   }
 
   goToFiles() {
     this.data.state = PageState.FILES;
-    //TODO: clear selected
+    this.data.selected.clear();
   }
 
   logout() {
@@ -36,8 +36,12 @@ export class MainPage {
     this.navCtrl.setRoot("WelcomePage");
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad MainPage');
+  ionViewCanEnter() {
+    return new Promise((resolve, reject) => {
+      this.auth.isAuthenticated()
+        .subscribe(authorised => {
+          authorised ? resolve() : reject('Not authorised')
+        });
+    });
   }
-
 }

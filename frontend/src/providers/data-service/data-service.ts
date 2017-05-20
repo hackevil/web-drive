@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import {ConnectionServiceProvider} from "../connection-service/connection-service";
+import {Observable} from "rxjs/Observable";
 
 enum ItemType {
   FOLDER, FILE
@@ -31,25 +32,55 @@ interface Folder {
 @Injectable()
 export class DataServiceProvider {
 
-  public folders = new Map<string, {files: Array<File>, folders: Array<Folder>}>();
+  public folders = new Map<number, {files: Array<File>, folders: Array<Folder>}>();
   public currentFolder = {files: [], folders: []};
   public folderLevels = [];
   public state = PageState.FILES;
+  public selected: Set<string> = new Set();
 
   constructor(private connection: ConnectionServiceProvider) {
-    this.loadFolder(-1);
-    const mainFolder = this.folders.get("drive");
-    this.currentFolder.files = mainFolder.files;
-    this.currentFolder.folders = mainFolder.folders;
+    this.enterFolder(-1);
   }
 
-  // 0 -> {files[], folders[Folder[1], Folder[2]])
-  // 2 -> {files[File[3]], folders[Folder[4]]
+  public enterFolder(folderId: number, parentId?: number) {
+    folderId = (folderId === null) ? -1 : folderId;
+    this.loadFolder(folderId).subscribe(result => {
+      if (result.success === true) {
+        this.selected.clear();
+        this.folders.set(folderId, {files: result.files, folders: result.folders});
+        this.setCurrentFolder(result);
+        if (parentId) this.folderLevels.push(parentId);
+      }
+    })
+  }
 
-  // Upon entering folder -> get folderId ->
-  // find folder in this.folders -> set currentFolder -> this.folders.get(folderId)
+  public exitFolder() {
+    this.selected.clear();
+    const parentId = this.folderLevels.pop();
+    const newFolder = this.folders.get(parentId);
+    this.setCurrentFolder(newFolder);
+  }
+
+  private setCurrentFolder(folder: {files: File[], folders: Folder[]}) {
+    this.currentFolder.files = folder.files;
+    this.currentFolder.folders = folder.folders;
+  }
 
   public loadFolder(folderId: number) {
+    return Observable.create(observer => {
+      this.connection.notify("folder/contents/" + folderId).subscribe(
+        result => this.handleLoadFolder(result, observer),
+        error => {
+          observer.next({success: false});
+          observer.complete()
+        }
+      );
+    });
+  }
+
+  private handleLoadFolder(result, observer) {
+    observer.next({success: true, files: result.files, folders: result.folders});
+    observer.complete()
   }
 
   public renameItem(id: string, name: string) {

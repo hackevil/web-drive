@@ -21,11 +21,7 @@ export class LoginPage {
     this.auth.login(this.credentials).subscribe(result => {
       if (result.success === true) {
         this.loading.dismiss().then(() => {
-          if (result.errors) {
-            //TODO: DISPLAY ERRORS
-          } else {
-            this.navCtrl.setRoot("MainPage");
-          }
+          this.navCtrl.setRoot("MainPage");
         });
       } else {
         this.showError();

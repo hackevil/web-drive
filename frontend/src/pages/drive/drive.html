@@ -24,16 +24,17 @@
   </div>
 
   <div class="row">
-    <div *ngFor="let folder of currentFolder.folders | myFilter:searchText:data.state" class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
+    <div *ngFor="let folder of currentFolder.folders | myFilter:searchText:data.state"
+         class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">
       <div class="panel panel-default">
         <div class="panel-heading text-center folder-header">
           <ion-checkbox class="item-checkbox"
-                        [checked]="selected.has(folder.id)"
-                        (click)="updateSelectedItems(folder.id)">
+                        [checked]="selected.has(folder.type + '-' + folder.id)"
+                        (click)="updateSelectedItems(folder.type + '-' + folder.id)">
           </ion-checkbox>
           <ion-icon name="briefcase" class="fa-5x"></ion-icon>
         </div>
-        <div class="panel-body text-muted folder-title truncate" (click)="enterFolder(folder.parent, folder.id)">
+        <div class="panel-body text-muted folder-title truncate" (click)="enterFolder(folder.folder_id, folder.id)">
           {{folder.name}}
         </div>
       </div>
@@ -49,12 +50,13 @@
   </div>
 
   <div class="row">
-    <div *ngFor="let file of currentFolder.files | myFilter:searchText:data.state" class="file col-lg-2 col-md-4 col-sm-6 col-xs-12">
+    <div *ngFor="let file of currentFolder.files | myFilter:searchText:data.state"
+         class="file col-lg-2 col-md-4 col-sm-6 col-xs-12">
       <div class="panel panel-default">
         <div class="panel-heading text-center file-header">
           <ion-checkbox class="item-checkbox"
-                        [checked]="selected.has(file.id)"
-                        (click)="updateSelectedItems(file.id)">
+                        [checked]="selected.has(file.type + '-' + file.id)"
+                        (click)="updateSelectedItems(file.type + '-' + file.id)">
           </ion-checkbox>
           <ion-icon name="document" class="fa-5x"></ion-icon>
         </div>
