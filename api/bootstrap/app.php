@@ -23,9 +23,13 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
- $app->withFacades();
+$app->configure('filesystems');
 
- $app->withEloquent();
+$app->withFacades();
+
+class_alias('Illuminate\Support\Facades\Storage', 'Storage');
+
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +86,7 @@ $app->singleton(
  $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
