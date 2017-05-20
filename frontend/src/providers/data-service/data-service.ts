@@ -37,7 +37,7 @@ export class DataServiceProvider {
   public state = PageState.FILES;
 
   constructor(private connection: ConnectionServiceProvider) {
-    this.loadFilesAndFolders();
+    this.loadFolder(-1);
     const mainFolder = this.folders.get("drive");
     this.currentFolder.files = mainFolder.files;
     this.currentFolder.folders = mainFolder.folders;
@@ -49,12 +49,7 @@ export class DataServiceProvider {
   // Upon entering folder -> get folderId ->
   // find folder in this.folders -> set currentFolder -> this.folders.get(folderId)
 
-  public loadFilesAndFolders() {
-    // Load all folder and file information from database
-    this.folders.set("drive", {files: [{id: "123", parent: "drive", deleted: true, name: "test.txt"}],
-      folders: [{id: "321", parent: "drive", name: "Books"}]});
-    this.folders.set("321", {files: [{id: "890", parent: "111", name: "yes.c"}],
-      folders: [{id: "345", parent: "222", name: "Novels"}]})
+  public loadFolder(folderId: number) {
   }
 
   public renameItem(id: string, name: string) {
@@ -75,6 +70,13 @@ export class DataServiceProvider {
   public uploadFiles() {
 
   }
+
+
+//   // Load all folder and file information from database
+//   this.folders.set("drive", {files: [{id: "123", parent: "drive", deleted: true, name: "test.txt"}],
+//   folders: [{id: "321", parent: "drive", name: "Books"}]});
+// this.folders.set("321", {files: [{id: "890", parent: "111", name: "yes.c"}],
+//   folders: [{id: "345", parent: "222", name: "Novels"}]})
 
 
   // TABLES:

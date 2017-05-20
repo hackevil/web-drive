@@ -18,6 +18,14 @@ $app->get("/", function () use ($app) {
 $app->post("login","UserController@authenticate");
 $app->post("register", "UserController@register");
 
-$app->group(['middleware' => ['auth']], function () {
-    // access and operate on files here.
+$app->group(['middleware' => ['auth']], function () use ($app) {
+    $app->group(['prefix' => "file"], function () use ($app) {
+        $app->delete("/{id}", "FileController@destroy");
+    });
+
+    $app->group(['prefix' => "folder"], function () use ($app) {
+        $app->post("/rename/{id}", "FolderController@rename");
+        $app->get("/contents/{id}", "FolderController@getContents");
+        $app->delete("/{id}", "FolderController@destroy");
+    });
 });

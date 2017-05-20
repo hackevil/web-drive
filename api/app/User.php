@@ -29,4 +29,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password', 'api_token', 'remember', 'created_at', 'updated_at'
     ];
+
+    public function folders($folderId = null)
+    {
+        return $this->hasMany('App\Folder','user_id')->withTrashed()
+            ->where("folder_id", $folderId)->get();
+    }
+
+    public function files($folderId = null)
+    {
+        return $this->hasMany('App\File','user_id')->withTrashed()
+            ->where("folder_id", $folderId)->get();
+    }
 }

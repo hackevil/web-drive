@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->unsignedInteger('allocated')->default(10); // Measured in gigabytes.
             $table->unsignedBigInteger('used')->default(0); // Measured in bytes.
-            $table->string('api_token', 60)->unique();
+            $table->string('api_token', 80)->unique();
             $table->boolean('remember')->default(false);
             $table->timestamps();
         });

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import {IonicPage, NavController, NavParams, Loading, LoadingController} from 'ionic-angular';
+import {IonicPage, NavController, Loading, LoadingController} from 'ionic-angular';
+import {AuthServiceProvider, Credentials} from "../../providers/auth-service/auth-service";
 
 @IonicPage()
 @Component({
@@ -9,13 +10,16 @@ import {IonicPage, NavController, NavParams, Loading, LoadingController} from 'i
 export class LoginPage {
 
   private loading: Loading;
-  private user = {email: "", password: "", remember: false};
+  private credentials: Credentials = {email: "", password: "", remember: false};
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
+  constructor(public navCtrl: NavController, private auth: AuthServiceProvider,
               private loadingCtrl: LoadingController) {
   }
 
   public login() {
+    this.auth.login(this.credentials).subscribe(result => {
+
+    });
     this.navCtrl.setRoot("MainPage");
   }
 

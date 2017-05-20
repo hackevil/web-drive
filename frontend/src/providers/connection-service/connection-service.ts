@@ -9,21 +9,21 @@ import {Observable} from "rxjs/Observable";
 export class ConnectionServiceProvider {
 
   private hasAuthToken: boolean = false;
-  private server: string = "https://localhost:8080/";
+  private server: string = "https://webdrive.dev/";
   private headers: Headers = new Headers();
 
   constructor(private http: Http, private storage: Storage) {}
 
   public setAuthToken(token: string) {
-    this.storage.set("auth_token", token).then( () => {
-      this.headers.set("Authenticated", token);
+    this.storage.set("api_token", token).then( () => {
+      this.headers.set("Authorization", "Bearer " + token);
       this.hasAuthToken = true;
     });
   }
 
   public clearAuthToken() {
-    this.storage.remove("auth_token").then( () => {
-      this.headers.delete("Authenticated");
+    this.storage.remove("api_token").then( () => {
+      this.headers.delete("Authorization");
       this.hasAuthToken = false;
     });
   }
