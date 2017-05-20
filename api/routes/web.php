@@ -11,6 +11,13 @@
 |
 */
 
-$app->get('/', function () use ($app) {
+$app->get("/", function () use ($app) {
     return $app->version();
+});
+
+$app->post("login","UserController@authenticate");
+$app->post("register", "UserController@register");
+
+$app->group(['middleware' => ['auth']], function () {
+    // access and operate on files here.
 });
