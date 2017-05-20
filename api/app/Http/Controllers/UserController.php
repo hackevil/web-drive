@@ -27,7 +27,7 @@ class UserController extends Controller
         }
 
         $user = User::where("email", $request->input("email"))->first();
-        if (Hash::check($request->input("password"), $user->password))
+        if ($user && Hash::check($request->input("password"), $user->password))
         {
             $apiToken = base64_encode(str_random(60));
             $user->api_token = $apiToken;

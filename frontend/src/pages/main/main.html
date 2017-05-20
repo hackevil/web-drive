@@ -32,7 +32,7 @@
         </ion-list>
 
         <div id="usage-wrapper">
-          <span>{{currentUser.usage}}GB out of 10GB used. ({{currentUser.usagePercent}}%)</span>
+          <span>{{currentUser.usage}}GB out of {{currentUser.allocated}}GB used. ({{currentUser.usagePercent}}%)</span>
           <div id="usage-container">
             <div id="usage" [style.width.%]="currentUser.usagePercent"></div>
           </div>

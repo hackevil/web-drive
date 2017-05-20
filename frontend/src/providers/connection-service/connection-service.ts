@@ -12,7 +12,9 @@ export class ConnectionServiceProvider {
   private server: string = "https://webdrive.dev/";
   private headers: Headers = new Headers();
 
-  constructor(private http: Http, private storage: Storage) {}
+  constructor(private http: Http, private storage: Storage) {
+    this.headers.append('Content-Type', 'application/json');
+  }
 
   public setAuthToken(token: string) {
     this.storage.set("api_token", token).then( () => {

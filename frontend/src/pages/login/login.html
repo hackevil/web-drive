@@ -18,7 +18,7 @@
                 <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
                 <div class="col-md-6">
-                  <input id="email" [(ngModel)]="user.email" type="email"
+                  <input id="email" [(ngModel)]="credentials.email" type="email"
                          class="form-control" name="email" required autofocus>
                 </div>
               </div>
@@ -27,19 +27,19 @@
                 <label for="password" class="col-md-4 control-label">Password</label>
 
                 <div class="col-md-6">
-                  <input id="password" [(ngModel)]="user.password"
+                  <input id="password" [(ngModel)]="credentials.password"
                          type="password" class="form-control" name="password" required>
                 </div>
               </div>
 
-              <div class="form-group">
-                <div class="col-md-8 col-md-offset-4">
-                  <ion-item class="remember-item">
-                    <ion-label fixed>Remember me</ion-label>
-                    <ion-checkbox></ion-checkbox>
-                  </ion-item>
-                </div>
-              </div>
+              <!--<div class="form-group">-->
+                <!--<div class="col-md-8 col-md-offset-4">-->
+                  <!--<ion-item class="remember-item">-->
+                    <!--<ion-label fixed>Remember me</ion-label>-->
+                    <!--<ion-checkbox></ion-checkbox>-->
+                  <!--</ion-item>-->
+                <!--</div>-->
+              <!--</div>-->
 
               <div class="form-group">
                 <div class="col-md-8 col-md-offset-4">

@@ -32,8 +32,6 @@ export class MainPage {
   }
 
   logout() {
-    // Change windows and logout
-    // clear key
     this.auth.logout();
     this.navCtrl.setRoot("WelcomePage");
   }
