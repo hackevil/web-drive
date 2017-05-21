@@ -20,6 +20,7 @@ $app->post("register", "UserController@register");
 
 $app->group(['middleware' => ['auth']], function () use ($app) {
     $app->group(['prefix' => "file"], function () use ($app) {
+        $app->post("/uploads", "FileController@uploads");
         $app->delete("/{id}", "FileController@destroy");
     });
 

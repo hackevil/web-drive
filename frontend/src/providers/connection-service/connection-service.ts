@@ -13,7 +13,6 @@ export class ConnectionServiceProvider {
   private server: string = "https://webdrive.dev/";
   private headers: Headers = new Headers();
 
-
   private replaySubject = new ReplaySubject<boolean>(1);
   private tokenExists: Observable<boolean> = this.replaySubject.asObservable();
 
@@ -24,7 +23,7 @@ export class ConnectionServiceProvider {
       this.replaySubject.next(this.hasAuthToken);
     });
 
-    this.headers.append('Content-Type', 'application/json');
+    // this.headers.append('Content-Type', 'application/json');
   }
 
   public setAuthToken(token: string): Observable<boolean> {

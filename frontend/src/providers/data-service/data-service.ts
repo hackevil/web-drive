@@ -33,7 +33,7 @@ interface Folder {
 export class DataServiceProvider {
 
   public folders = new Map<number, {files: Array<File>, folders: Array<Folder>}>();
-  public currentFolder = {files: [], folders: []};
+  public currentFolder = {id: -1, files: [], folders: []};
   public folderLevels = [];
   public state = PageState.FILES;
   public selected: Set<string> = new Set();
@@ -46,7 +46,7 @@ export class DataServiceProvider {
       if (result.success === true) {
         this.selected.clear();
         this.folders.set(folderId, {files: result.files, folders: result.folders});
-        this.setCurrentFolder(result);
+        this.setCurrentFolder(folderId, result);
         if (parentId) this.folderLevels.push(parentId);
       }
     })
@@ -56,15 +56,16 @@ export class DataServiceProvider {
     this.selected.clear();
     const parentId = this.folderLevels.pop();
     const newFolder = this.folders.get(parentId);
-    this.setCurrentFolder(newFolder);
+    this.setCurrentFolder(parentId, newFolder);
   }
 
-  private setCurrentFolder(folder: {files: File[], folders: Folder[]}) {
+  private setCurrentFolder(parentId: number, folder: {files: File[], folders: Folder[]}) {
+    this.currentFolder.id = parentId;
     this.currentFolder.files = folder.files;
     this.currentFolder.folders = folder.folders;
   }
 
-  public loadFolder(folderId: number) {
+  public loadFolder(folderId: number): Observable<any> {
     return Observable.create(observer => {
       this.connection.notify("folder/contents/" + folderId).subscribe(
         result => this.handleLoadFolder(result, observer),
@@ -96,21 +97,20 @@ export class DataServiceProvider {
     // this.connection.send("download", {items: items});
   }
 
-  public uploadFiles() {
-
+  public uploadFiles(files: FormData): Observable<any> {
+    return Observable.create(observer => {
+      this.connection.send("file/uploads", files).subscribe(
+        result => this.handleFilesUpload(result, observer),
+        error => {
+          observer.next({success: false});
+          observer.complete()
+        }
+      )
+    });
   }
 
-
-//   // Load all folder and file information from database
-//   this.folders.set("drive", {files: [{id: "123", parent: "drive", deleted: true, name: "test.txt"}],
-//   folders: [{id: "321", parent: "drive", name: "Books"}]});
-// this.folders.set("321", {files: [{id: "890", parent: "111", name: "yes.c"}],
-//   folders: [{id: "345", parent: "222", name: "Novels"}]})
-
-
-  // TABLES:
-  // (Folders, Files) -> User, Users, Shared (fileId / folderId -> user)
-
-
-
+  private handleFilesUpload(result, observer) {
+    observer.next({success: true, result: result});
+    observer.complete();
+  }
 }

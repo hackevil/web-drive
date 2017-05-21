@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {AlertController, IonicPage, PopoverController} from 'ionic-angular';
 import {DataServiceProvider} from "../../providers/data-service/data-service";
-import {AuthServiceProvider, User} from "../../providers/auth-service/auth-service";
+import {AuthServiceProvider} from "../../providers/auth-service/auth-service";
 
 @IonicPage()
 @Component({

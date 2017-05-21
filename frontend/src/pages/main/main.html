@@ -23,8 +23,9 @@
             <ion-icon name="trash" item-left></ion-icon>Trash
             <ion-icon *ngIf="data.state === 15" name="star-half" item-right></ion-icon>
           </button>
-          <button ion-item>
+          <button (click)="chooseFiles()" ion-item>
             <ion-icon name="cloud-upload" item-left></ion-icon>Upload
+            <input #fileInput (change)="fileInputChangeEvent()" type="file" accept="*" id="uploaded" multiple/>
           </button>
           <button (click)="logout()" ion-item>
             <ion-icon name="exit" item-left></ion-icon>Logout

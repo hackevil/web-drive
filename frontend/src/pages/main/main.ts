@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {IonicPage, NavController} from 'ionic-angular';
 import {AuthServiceProvider, User} from "../../providers/auth-service/auth-service";
 import {DataServiceProvider, PageState} from "../../providers/data-service/data-service";
-
 
 @IonicPage()
 @Component({
@@ -10,6 +9,8 @@ import {DataServiceProvider, PageState} from "../../providers/data-service/data-
   templateUrl: 'main.html',
 })
 export class MainPage {
+
+  @ViewChild('fileInput') fileInput;
 
   public activePage = "DrivePage";
   private currentUser: User;
@@ -27,6 +28,28 @@ export class MainPage {
   goToFiles() {
     this.data.state = PageState.FILES;
     this.data.selected.clear();
+  }
+
+  chooseFiles() {
+    let event: MouseEvent = new MouseEvent('click', {bubbles: false});
+    this.fileInput.nativeElement.dispatchEvent(event);
+  }
+
+  fileInputChangeEvent() {
+    const inputElement: HTMLInputElement = this.fileInput.nativeElement;
+    let count: number = inputElement.files.length;
+    let formData = new FormData();
+    if (count > 0) {
+      for (let i = 0; i < count; i++) {
+        formData.append('files[]', inputElement.files.item(i));
+      }
+      formData.set("folderId", this.data.currentFolder.id.toString());
+      this.data.uploadFiles(formData).subscribe(result => {
+        console.log("HEREEEEEEEEEE");
+        console.log(result);
+        inputElement.value = null;
+      });
+    }
   }
 
   logout() {
