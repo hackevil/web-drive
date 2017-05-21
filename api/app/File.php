@@ -15,6 +15,10 @@ class File extends Model
         'name', 'user_id', 'folder_id','type', 'path', 'extension', 'size', 'mimeType'
     ];
 
+    protected $hidden = [
+        'path', 'user_id'
+    ];
+
     protected $dates = ['deleted_at'];
 
     public function user()

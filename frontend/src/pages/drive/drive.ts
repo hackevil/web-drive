@@ -11,21 +11,32 @@ import {AuthServiceProvider} from "../../providers/auth-service/auth-service";
 export class DrivePage {
 
   private currentFolder;
-  private selected;
   public searchText = "";
+
+  private selected;
+  private selectedIds;
 
   constructor(private popoverCtrl: PopoverController, private data: DataServiceProvider,
               private alertCtrl: AlertController, private auth: AuthServiceProvider) {
     this.currentFolder = this.data.currentFolder;
     this.selected = this.data.selected;
+    this.selectedIds = this.data.selectedIds;
   }
 
-  updateSelectedItems(id) {
-    (this.selected.has(id) === false) ? this.selected.add(id) : this.selected.delete(id);
+  updateSelectedItems(item) {
+    (this.selected.has(item) === false) ? this.selected.add(item) : this.selected.delete(item);
+    (this.selectedIds.has(item.id) === false) ? this.selectedIds.add(item.id) : this.selectedIds.delete(item.id);
   }
 
   enterFolder(folderId: number, parentId?: number, ) {
     this.data.enterFolder(folderId, parentId);
+  }
+
+  createFolder() {
+    const currentFolderId = this.currentFolder.id;
+    this.data.createFolder(currentFolderId, "test").subscribe(result => {
+      this.data.refreshFolder(currentFolderId);
+    });
   }
 
   exitFolder() {
@@ -33,13 +44,14 @@ export class DrivePage {
   }
 
   renameItem() {
-    const selectItemId = this.selected.values().next().value;
+    const selectedItem = this.selected.values().next().value;
     let prompt = this.alertCtrl.create({
       title: 'Rename',
       inputs: [
         {
           name: 'name',
-          placeholder: 'Name'
+          placeholder: 'Name',
+          value: selectedItem.name
         },
       ],
       buttons: [
@@ -50,10 +62,14 @@ export class DrivePage {
           text: 'Save',
           handler: data => {
             if (data.name === "") return false;
-            let promptHide = prompt.dismiss();
-            promptHide.then(() => {
+            prompt.dismiss().then(() => {
               // Show spinner
-              this.data.renameItem(selectItemId, data.name);
+              const currentFolderId = this.data.currentFolder.id;
+              this.data.renameItem(selectedItem, data.name).subscribe(result => {
+                if (result.success === true) {
+                  this.data.refreshFolder(currentFolderId);
+                }
+              });
               // hide spinner
               // clear selected
             });
@@ -77,7 +93,18 @@ export class DrivePage {
         {
           text: 'Delete',
           handler: () => {
-            console.log('Delete clicked');
+            alert.dismiss().then(() => {
+              // Show spinner
+              const currentFolderId = this.data.currentFolder.id;
+              this.data.deleteItems(this.selected).subscribe(result => {
+                if (result.success === true) {
+                  this.data.refreshFolder(currentFolderId);
+                }
+              });
+              // hide spinner
+              // clear selected
+            });
+            return false;
           }
         }
       ]
@@ -85,14 +112,14 @@ export class DrivePage {
     alert.present();
   }
 
-  downloadItems() {
+  downloadItem() {
+    const selectedItem = this.selected.values().next().value;
+    this.data.downloadItem(selectedItem).subscribe(result => {
+      if (result.success === true) this.data.clearSelected();
+    });
   }
 
   shareItems() {
-  }
-
-  clearSelected() {
-    this.selected.clear();
   }
 
   presentPopover(myEvent) {
@@ -103,6 +130,7 @@ export class DrivePage {
   }
 
   ionViewDidLoad() {
+    console.log("ENTERING DRIVE");
     const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
       if (hasToken === true) {
         subscription.unsubscribe();

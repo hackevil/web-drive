@@ -18,6 +18,7 @@ class CreateFoldersTable extends Migration
             $table->string('name');
             $table->string('type')->default('folder');
             $table->integer('user_id')->unsigned();
+            $table->string('path', 800);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->integer('folder_id')->nullable()->unsigned();
             $table->foreign('folder_id')->references('id')->on('folders')->onDelete('cascade');

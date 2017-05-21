@@ -18,6 +18,8 @@
           <ion-icon style="cursor:pointer; padding-right: 10px;"
                     *ngIf="data.folderLevels.length > 0" icon-left name="arrow-dropleft-circle"
                     (click)="exitFolder()"></ion-icon> Folders
+          <ion-icon style="cursor:pointer; padding-right: 10px;" icon-right name="add"
+                    (click)="createFolder()"></ion-icon>
         </div>
       </div>
     </div>
@@ -29,8 +31,8 @@
       <div class="panel panel-default">
         <div class="panel-heading text-center folder-header">
           <ion-checkbox class="item-checkbox"
-                        [checked]="selected.has(folder.type + '-' + folder.id)"
-                        (click)="updateSelectedItems(folder.type + '-' + folder.id)">
+                        [checked]="selected.has(folder)"
+                        (click)="updateSelectedItems(folder)">
           </ion-checkbox>
           <ion-icon name="briefcase" class="fa-5x"></ion-icon>
         </div>
@@ -55,8 +57,8 @@
       <div class="panel panel-default">
         <div class="panel-heading text-center file-header">
           <ion-checkbox class="item-checkbox"
-                        [checked]="selected.has(file.type + '-' + file.id)"
-                        (click)="updateSelectedItems(file.type + '-' + file.id)">
+                        [checked]="selected.has(file)"
+                        (click)="updateSelectedItems(file)">
           </ion-checkbox>
           <ion-icon name="document" class="fa-5x"></ion-icon>
         </div>
@@ -67,23 +69,23 @@
     </div>
   </div>
 
-  <h5 hideWhen="android,ios" class="text-center text-muted">Drag Files here to upload.</h5>
+  <!--<h5 hideWhen="android,ios" class="text-center text-muted">Drag Files here to upload.</h5>-->
 
 </ion-content>
 
 <ion-footer>
   <ion-toolbar>
     <span class="hide-on-small" hideWhen="android,ios">
-      <button *ngIf="selected.size > 0"
+      <button disabled *ngIf="selected.size > 0"
               ion-button icon-left clear
               (click)="shareItems()">
         <ion-icon name="share" aria-label="share"></ion-icon>
         Share
       </button>
 
-      <button *ngIf="selected.size > 0"
+      <button *ngIf="selected.size === 1"
               ion-button icon-left clear
-              (click)="downloadItems()">
+              (click)="downloadItem()">
         <ion-icon name="cloud-download" aria-label="download"></ion-icon>
         Download
       </button>
@@ -110,7 +112,7 @@
 
     <button *ngIf="selected.size > 0" class="pull-right"
             ion-button icon-right clear end
-            (click)="clearSelected()">
+            (click)="data.clearSelected()">
       <ion-icon name="close" aria-label="unselect"></ion-icon>
       {{selected.size}} Selected
     </button>

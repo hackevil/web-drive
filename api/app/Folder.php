@@ -14,7 +14,11 @@ class Folder extends Model
     protected $softCascade = ['files', 'folders'];
 
     protected $fillable = [
-        'name', 'user_id', 'folder_id','type'
+        'name', 'user_id', 'folder_id','type', 'path'
+    ];
+
+    protected $hidden = [
+        'path', 'user_id'
     ];
 
     protected $dates = ['deleted_at'];

@@ -48,14 +48,30 @@ export class ConnectionServiceProvider {
     return this.tokenExists;
   }
 
-  public notify(endpoint: string, params?) : Observable<string> {
+  public notify(endpoint: string, params?) : Observable<any> {
         return this.http.get(this._getUrl(endpoint),
           this._getRequestArguments(params)).map(response => response.json());
   }
 
-  public send(endpoint: string, data?: any, files=false): Observable<string> {
-        return this.http.post(this._getUrl(endpoint), data,
-          this._getRequestArguments(null, files)).map(response => response.json());
+  public remove(endpoint: string) : Observable<any> {
+    return this.http.delete(this._getUrl(endpoint),
+      this._getRequestArguments()).map(response => response.json());
+  }
+
+  public send(endpoint: string, data?: any, files=false): Observable<any> {
+    return this.http.post(this._getUrl(endpoint), data,
+      this._getRequestArguments(null, files)).map(response => response.json());
+  }
+
+  public download(endpoint: string): Observable<any> {
+    let headers = new Headers();
+    headers.set("Content-Type", 'application/zip');
+    headers.set("Accept", "'application/zip'");
+    headers.set("Authorization", this.headers.get("Authorization"));
+    return this.http.get(this._getUrl(endpoint), {
+      headers: headers,
+      responseType: ResponseContentType.ArrayBuffer
+    }).map(response => response['_body']);
   }
 
   private _getUrl(endpoint: string): string {

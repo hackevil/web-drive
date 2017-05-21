@@ -29,6 +29,7 @@ $app->configure('cors');
 $app->withFacades();
 
 class_alias('Illuminate\Support\Facades\Storage', 'Storage');
+//class_alias('Chumper\Zipper\Zipper', 'Zipper');
 
 $app->withEloquent();
 
@@ -83,13 +84,21 @@ $app->singleton(
 |
 */
 
- $app->register(App\Providers\AppServiceProvider::class);
- $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
 $app->register(Askedio\SoftCascade\Providers\LumenServiceProvider::class);
 $app->register(Barryvdh\Cors\ServiceProvider::class);
+//$app->register(Chumper\Zipper\ZipperServiceProvider::class);
+
+$app->singleton('zipper', function($app)
+{
+    $return = $app->make('Chumper\Zipper\Zipper');
+    return $return;
+});
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

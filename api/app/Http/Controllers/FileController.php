@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\File;
+use App\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
@@ -26,9 +27,15 @@ class FileController extends Controller
 
     public function uploads(Request $request)
     {
+        $userId = $request->user()->id;
         $files = Input::file('files');
         $folderId = $request->input("folderId");
-        $folderName = "folder-" . $folderId;
+        $folderPath = "drive-" . $userId;
+        if ($folderId > -1) {
+            $folder = Folder::find($folderId);
+            if (!$folder) return response()->json(["status" => "fail"], 200);
+            $folderPath = $folderPath . $folder->path;
+        }
 
         $count = count($files);
         $uploaded = 0;
@@ -38,13 +45,13 @@ class FileController extends Controller
             $rules = array('file' => 'required|file|mimes:png,gif,jpeg,txt,pdf,doc,docx,ico|max:50000'); //50MB
             $validator = Validator::make(array('file'=> $file), $rules);
             if($validator->passes()) {
-                $path = Storage::putFile($folderName, $file);
+                $path = Storage::putFile($folderPath, $file);
                 File::create([
                     "name" => $file->getClientOriginalName(),
                     "extension" => $file->getClientOriginalExtension(),
                     "size" => $file->getSize(),
                     "mimeType" => $file->getMimeType(),
-                    "user_id" => $request->user()->id,
+                    "user_id" => $userId,
                     "folder_id" => ($folderId < 0) ? null : $folderId,
                     "path" => $path
                 ]);

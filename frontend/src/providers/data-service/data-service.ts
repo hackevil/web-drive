@@ -3,6 +3,8 @@ import 'rxjs/add/operator/map';
 import {ConnectionServiceProvider} from "../connection-service/connection-service";
 import {Observable} from "rxjs/Observable";
 
+import * as download from "in-browser-download";
+
 enum ItemType {
   FOLDER, FILE
 }
@@ -36,18 +38,27 @@ export class DataServiceProvider {
   public currentFolder = {id: -1, files: [], folders: []};
   public folderLevels = [];
   public state = PageState.FILES;
-  public selected: Set<string> = new Set();
+
+  public selected: Set<any> = new Set();
+  public selectedIds: Set<number> = new Set();
 
   constructor(private connection: ConnectionServiceProvider) {}
 
+  public clearSelected() {
+    this.selected.clear();
+    this.selectedIds.clear();
+
+  }
+
   public enterFolder(folderId: number, parentId?: number) {
     folderId = (folderId === null) ? -1 : folderId;
+    parentId = (parentId === null) ? -1 : parentId;
     this.loadFolder(folderId).subscribe(result => {
       if (result.success === true) {
-        this.selected.clear();
+        this.clearSelected();
         this.folders.set(folderId, {files: result.files, folders: result.folders});
         this.setCurrentFolder(folderId, result);
-        if (parentId) this.folderLevels.push(parentId);
+        if (folderId > -1) this.folderLevels.push(parentId);
       }
     })
   }
@@ -55,7 +66,7 @@ export class DataServiceProvider {
   public refreshFolder(folderId: number) {
     this.loadFolder(folderId).subscribe(result => {
       if (result.success === true) {
-        this.selected.clear();
+        this.clearSelected();
         const folder = this.folders.get(folderId);
         folder.files = result.files;
         folder.folders = result.folders;
@@ -66,8 +77,23 @@ export class DataServiceProvider {
     })
   }
 
+  public createFolder(parentFolderId: number, name: string) {
+    return Observable.create(observer => {
+      this.connection.send("folder/create/inside/" + parentFolderId, JSON.stringify({name: name})).subscribe(
+        result => {
+          observer.next({success: true});
+          observer.complete()
+        },
+        error => {
+          observer.next({success: false});
+          observer.complete();
+        }
+      )
+    });
+  }
+
   public exitFolder() {
-    this.selected.clear();
+    this.clearSelected();
     const parentId = this.folderLevels.pop();
     const newFolder = this.folders.get(parentId);
     this.setCurrentFolder(parentId, newFolder);
@@ -96,19 +122,73 @@ export class DataServiceProvider {
     observer.complete()
   }
 
-  public renameItem(id: string, name: string) {
-    // Rename item (folder / file)
-    // this.connection.send("rename", {name: name});
+  public renameItem(selectedItem: any, name: string): Observable<any> {
+    const [type, id] = [selectedItem.type, selectedItem.id];
+    return Observable.create(observer => {
+      this.connection.send(type + "/rename/" + id, JSON.stringify({name: name})).subscribe(
+        result => {
+          if (result.status === "success") {
+            observer.next({success: true});
+          } else {
+            observer.next({success: false});
+          }
+          observer.complete();
+        },
+        error => {
+          observer.next({success: false});
+          observer.complete();
+        }
+      );
+    });
   }
 
-  public deleteItems(items: Array<string>) {
-    // Delete item from database and remove from array
-    // this.connection.send("delete", {items: items});
+  public deleteItems(selectedItems: Set<any>): Observable<any> {
+    return Observable.create(observer => {
+      let failedToDelete = [];
+      const count = selectedItems.size;
+      let completed = 0;
+
+      selectedItems.forEach(item => {
+        const [type, id] = [item.type, item.id];
+        this.connection.remove(type + "/delete/" + id).subscribe(
+          result => {
+            completed++;
+            if (result.status !== "success") {
+              failedToDelete.push({id: item.id, name: item.name});
+            }
+            if (completed === count) {
+              observer.next({success: true, failed: failedToDelete});
+              observer.complete();
+            }
+          },
+          error => {
+            completed++;
+            failedToDelete.push({id: item.id, name: item.name});
+            if (completed === count) {
+              observer.next({success: true, failed: failedToDelete});
+              observer.complete();
+            }
+          }
+        );
+      });
+    });
   }
 
-  public downloadItems(items: Array<string>) {
-    // Download items from the file storage
-    // this.connection.send("download", {items: items});
+  public downloadItem(selectedItem: any): Observable<any> {
+    const [type, id] = [selectedItem.type, selectedItem.id];
+    return Observable.create(observer => {
+      this.connection.download(type + "/download/" + id).subscribe(
+        result => {
+          download(result, selectedItem.name + ".zip");
+          observer.next({success: true});
+          observer.complete();
+        },
+        error => {
+          observer.next({success: false});
+          observer.complete();
+        }
+      );
+    });
   }
 
   public uploadFiles(formData: FormData): Observable<any> {

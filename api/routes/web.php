@@ -20,13 +20,16 @@ $app->post("register", "UserController@register");
 
 $app->group(['middleware' => ['auth']], function () use ($app) {
     $app->group(['prefix' => "file"], function () use ($app) {
+        $app->post("/rename/{id}", "FileController@rename");
         $app->post("/uploads", "FileController@uploads");
-        $app->delete("/{id}", "FileController@destroy");
+        $app->delete("delete/{id}", "FileController@destroy");
     });
 
     $app->group(['prefix' => "folder"], function () use ($app) {
+        $app->get("/download/{id}", "FolderController@download");
+        $app->post("/create/inside/{id}", "FolderController@create");
         $app->post("/rename/{id}", "FolderController@rename");
         $app->get("/contents/{id}", "FolderController@getContents");
-        $app->delete("/{id}", "FolderController@destroy");
+        $app->delete("delete/{id}", "FolderController@destroy");
     });
 });

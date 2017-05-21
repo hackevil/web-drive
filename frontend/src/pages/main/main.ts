@@ -61,6 +61,7 @@ export class MainPage {
   }
 
   ionViewDidLoad() {
+    console.log("ENTERING MAIN");
     this.goToFiles();
     const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
       subscription.unsubscribe();
