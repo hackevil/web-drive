@@ -12,13 +12,11 @@ export class DrivePage {
 
   private currentFolder;
   private selected;
-  private currentUser: User;
   public searchText = "";
 
   constructor(private popoverCtrl: PopoverController, private data: DataServiceProvider,
               private alertCtrl: AlertController, private auth: AuthServiceProvider) {
     this.currentFolder = this.data.currentFolder;
-    this.currentUser = this.auth.getAuthenticatedUser();
     this.selected = this.data.selected;
   }
 
@@ -26,7 +24,7 @@ export class DrivePage {
     (this.selected.has(id) === false) ? this.selected.add(id) : this.selected.delete(id);
   }
 
-  enterFolder(parentId: number, folderId: number) {
+  enterFolder(folderId: number, parentId?: number, ) {
     this.data.enterFolder(folderId, parentId);
   }
 
@@ -104,8 +102,12 @@ export class DrivePage {
     });
   }
 
-  // ionViewCanEnter(): Promise<boolean> {
-  //   return this.auth.isAuthenticated();
-  // }
-
+  ionViewDidLoad() {
+    const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
+      if (hasToken === true) {
+        subscription.unsubscribe();
+        this.data.enterFolder(-1);
+      }
+    });
+  }
 }

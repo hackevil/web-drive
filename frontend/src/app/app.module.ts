@@ -21,9 +21,7 @@ import {HttpModule} from "@angular/http";
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp, {
-      locationStrategy: "path"
-    }),
+    IonicModule.forRoot(MyApp),
     IonicStorageModule.forRoot(),
     HttpModule
   ],

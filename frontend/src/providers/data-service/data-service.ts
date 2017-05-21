@@ -38,9 +38,7 @@ export class DataServiceProvider {
   public state = PageState.FILES;
   public selected: Set<string> = new Set();
 
-  constructor(private connection: ConnectionServiceProvider) {
-    this.enterFolder(-1);
-  }
+  constructor(private connection: ConnectionServiceProvider) {}
 
   public enterFolder(folderId: number, parentId?: number) {
     folderId = (folderId === null) ? -1 : folderId;

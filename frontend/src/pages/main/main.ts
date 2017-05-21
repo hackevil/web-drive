@@ -11,14 +11,12 @@ import {DataServiceProvider, PageState} from "../../providers/data-service/data-
 })
 export class MainPage {
 
-  private activePage;
+  public activePage = "DrivePage";
   private currentUser: User;
 
   constructor(private auth: AuthServiceProvider, private data: DataServiceProvider,
               public navCtrl: NavController) {
-    this.activePage = "DrivePage";
-    this.currentUser = this.auth.getAuthenticatedUser();
-    this.goToFiles();
+    this.currentUser = this.auth.authUser;
   }
 
   goToTrash() {
@@ -36,12 +34,16 @@ export class MainPage {
     this.navCtrl.setRoot("WelcomePage");
   }
 
-  ionViewCanEnter() {
-    return new Promise((resolve, reject) => {
-      this.auth.isAuthenticated()
-        .subscribe(authorised => {
-          authorised ? resolve() : reject('Not authorised')
-        });
+  ionViewDidLoad() {
+    this.goToFiles();
+    const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
+      subscription.unsubscribe();
+      if (hasToken === true) {
+        // Load user from server.
+        this.currentUser = this.auth.loadAuthenticatedUser();
+      } else {
+        this.logout();
+      }
     });
   }
 }

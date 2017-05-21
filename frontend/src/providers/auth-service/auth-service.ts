@@ -54,7 +54,7 @@ export interface Registration {
 @Injectable()
 export class AuthServiceProvider {
 
-  private authUser: User = null;
+  public authUser: User = null;
 
   constructor(private connection: ConnectionServiceProvider) {}
 
@@ -72,13 +72,14 @@ export class AuthServiceProvider {
       const user = result.user;
       this.authUser = new User(user.id, user.name, user.email, user.used);
       const token = result.api_token;
-      this.connection.setAuthToken(token);
-      observer.next({success: true});
+      this.connection.setAuthToken(token).subscribe(() => {
+        observer.next({success: true});
+        observer.complete();
+      });
     } else {
-      observer.next({success: false, errors: result.errors})
+      observer.next({success: false, errors: result.errors});
+      observer.complete();
     }
-    observer.complete()
-
   }
 
   public logout() {
@@ -94,7 +95,9 @@ export class AuthServiceProvider {
     });
   }
 
-  public getAuthenticatedUser() {
+  public loadAuthenticatedUser(): User {
+    // TODO: Load the user from the server. Helps with refresh.
+    // Don't send the user with the login anymore.
     return this.authUser;
   }
 

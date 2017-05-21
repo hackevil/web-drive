@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {AlertController, IonicPage, Loading, LoadingController, NavController} from 'ionic-angular';
+import {Component, ViewChild} from '@angular/core';
+import {AlertController, IonicPage, Loading, LoadingController, Navbar, NavController} from 'ionic-angular';
 import {AuthServiceProvider, Registration} from "../../providers/auth-service/auth-service";
 
 @IonicPage()
@@ -8,6 +8,8 @@ import {AuthServiceProvider, Registration} from "../../providers/auth-service/au
   templateUrl: 'register.html',
 })
 export class RegisterPage {
+
+  @ViewChild(Navbar) navBar: Navbar;
 
   private loading: Loading;
   private registration: Registration = {name: "", email: "", password: "", password_confirmation: ""};
@@ -65,7 +67,13 @@ export class RegisterPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad RegisterPage');
+    this.navBar.backButtonClick = (e:UIEvent) => {
+      this.navCtrl.setRoot("WelcomePage")
+    };
+    this.auth.isAuthenticated().subscribe(hasToken => {
+      if (hasToken === true) {
+        this.navCtrl.setRoot("MainPage");
+      }
+    })
   }
-
 }

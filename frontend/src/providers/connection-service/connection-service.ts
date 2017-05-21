@@ -27,15 +27,21 @@ export class ConnectionServiceProvider {
     this.headers.append('Content-Type', 'application/json');
   }
 
-  public setAuthToken(token: string) {
-    this.storage.set("api_token", token).then( () => {
-      this.headers.set("Authorization", "Bearer " + token);
-      this.hasAuthToken = true;
+  public setAuthToken(token: string): Observable<boolean> {
+    return Observable.create(observer => {
+      this.storage.set("api_token", token).then( () => {
+        this.replaySubject.next(true);
+        this.headers.set("Authorization", "Bearer " + token);
+        this.hasAuthToken = true;
+        observer.next(true);
+        observer.complete();
+      });
     });
   }
 
   public clearAuthToken() {
     this.storage.remove("api_token").then( () => {
+      this.replaySubject.next(false);
       this.headers.delete("Authorization");
       this.hasAuthToken = false;
     });
@@ -46,33 +52,13 @@ export class ConnectionServiceProvider {
   }
 
   public notify(endpoint: string, params?) : Observable<string> {
-    return Observable.create( observer => {
-      this.tokenExists.subscribe(hasToken => {
-        this.http.get(this._getUrl(endpoint),
-          this._getRequestArguments(params)).subscribe(response => {
-            observer.next(response.json());
-            observer.complete();
-        }, error => {
-          observer.next(error);
-          observer.complete()
-        });
-      });
-    });
+        return this.http.get(this._getUrl(endpoint),
+          this._getRequestArguments(params)).map(response => response.json());
   }
 
   public send(endpoint: string, data?: any): Observable<string> {
-    return Observable.create( observer => {
-      this.tokenExists.subscribe(hasToken => {
-        this.http.post(this._getUrl(endpoint), data,
-          this._getRequestArguments()).subscribe(response => {
-          observer.next(response.json());
-          observer.complete();
-        }, error => {
-          observer.next(error);
-          observer.complete()
-        });
-      });
-    });
+        return this.http.post(this._getUrl(endpoint), data,
+          this._getRequestArguments()).map(response => response.json());
   }
 
   private _getUrl(endpoint: string): string {

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import {IonicPage, NavController, Loading, LoadingController, AlertController} from 'ionic-angular';
+import {Component, ViewChild} from '@angular/core';
+import {IonicPage, NavController, Loading, LoadingController, AlertController, Navbar} from 'ionic-angular';
 import {AuthServiceProvider, Credentials} from "../../providers/auth-service/auth-service";
 
 @IonicPage()
@@ -8,6 +8,8 @@ import {AuthServiceProvider, Credentials} from "../../providers/auth-service/aut
   templateUrl: 'login.html',
 })
 export class LoginPage {
+
+  @ViewChild(Navbar) navBar: Navbar;
 
   private loading: Loading;
   private credentials: Credentials = {email: "", password: "", remember: false};
@@ -18,9 +20,10 @@ export class LoginPage {
 
   public login() {
     this.toggleLoading();
-    this.auth.login(this.credentials).subscribe(result => {
+    const subscription = this.auth.login(this.credentials).subscribe(result => {
       if (result.success === true) {
         this.loading.dismiss().then(() => {
+          subscription.unsubscribe();
           this.navCtrl.setRoot("MainPage");
         });
       } else {
@@ -49,7 +52,15 @@ export class LoginPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad LoginPage');
+    this.navBar.backButtonClick = (e:UIEvent) => {
+      this.navCtrl.setRoot("WelcomePage")
+    };
+    const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
+      subscription.unsubscribe();
+      if (hasToken === true) {
+        this.navCtrl.setRoot("MainPage");
+      }
+    })
   }
 
 }

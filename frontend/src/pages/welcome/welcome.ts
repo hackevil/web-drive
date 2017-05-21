@@ -8,19 +8,18 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class WelcomePage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController) {
   }
 
   public goToLogin() {
-    this.navCtrl.push("LoginPage");
+    this.navCtrl.setRoot("LoginPage");
   }
 
   public goToRegister() {
-    this.navCtrl.push("RegisterPage");
+    this.navCtrl.setRoot("RegisterPage");
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad WelcomePage');
   }
-
 }
