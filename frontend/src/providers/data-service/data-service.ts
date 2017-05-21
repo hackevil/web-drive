@@ -52,6 +52,20 @@ export class DataServiceProvider {
     })
   }
 
+  public refreshFolder(folderId: number) {
+    this.loadFolder(folderId).subscribe(result => {
+      if (result.success === true) {
+        this.selected.clear();
+        const folder = this.folders.get(folderId);
+        folder.files = result.files;
+        folder.folders = result.folders;
+        if (folderId === this.currentFolder.id) {
+          this.setCurrentFolder(folderId, folder);
+        }
+      }
+    })
+  }
+
   public exitFolder() {
     this.selected.clear();
     const parentId = this.folderLevels.pop();
@@ -97,9 +111,9 @@ export class DataServiceProvider {
     // this.connection.send("download", {items: items});
   }
 
-  public uploadFiles(files: FormData): Observable<any> {
+  public uploadFiles(formData: FormData): Observable<any> {
     return Observable.create(observer => {
-      this.connection.send("file/uploads", files).subscribe(
+      this.connection.send("file/uploads", formData, true).subscribe(
         result => this.handleFilesUpload(result, observer),
         error => {
           observer.next({success: false});
@@ -110,7 +124,13 @@ export class DataServiceProvider {
   }
 
   private handleFilesUpload(result, observer) {
-    observer.next({success: true, result: result});
-    observer.complete();
+    if (result.status === "success") {
+      observer.next({success: true, result: result});
+      observer.complete();
+    } else if (result.status === "fail") {
+      observer.next({success: true, failed: result.failed, count: result.count});
+      observer.complete();
+    }
+
   }
 }

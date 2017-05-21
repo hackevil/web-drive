@@ -17,6 +17,10 @@ class CreateFilesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('type')->default('file');
+            $table->string('path', 600);
+            $table->unsignedMediumInteger('size');
+            $table->string('extension');
+            $table->string('mimeType');
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->integer('folder_id')->nullable()->unsigned();

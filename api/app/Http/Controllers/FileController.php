@@ -32,29 +32,32 @@ class FileController extends Controller
 
         $count = count($files);
         $uploaded = 0;
-        $result = array();
+        $failed = array();
 
         foreach($files as $file) {
-            $rules = array('file' => 'required|mimes:png,gif,jpeg,txt,pdf,doc,ico');
+            $rules = array('file' => 'required|file|mimes:png,gif,jpeg,txt,pdf,doc,docx,ico|max:50000'); //50MB
             $validator = Validator::make(array('file'=> $file), $rules);
-            if($validator->passes()){
+            if($validator->passes()) {
                 $path = Storage::putFile($folderName, $file);
-                $result[] = [
+                File::create([
                     "name" => $file->getClientOriginalName(),
                     "extension" => $file->getClientOriginalExtension(),
                     "size" => $file->getSize(),
+                    "mimeType" => $file->getMimeType(),
                     "user_id" => $request->user()->id,
-                    "folder_id" => $folderId,
+                    "folder_id" => ($folderId < 0) ? null : $folderId,
                     "path" => $path
-                ];
+                ]);
                 $uploaded++;
+            } else {
+                $failed[] = [$validator->messages()];
             }
         }
 
         if($uploaded == $count) {
             return response()->json(["status" => "success"]);
         } else {
-            return response()->json(["status" => "fail"]);
+            return response()->json(["status" => "fail", "failed" => $failed, "count" => ($uploaded - $count)]);
         }
     }
 

@@ -43,10 +43,13 @@ export class MainPage {
       for (let i = 0; i < count; i++) {
         formData.append('files[]', inputElement.files.item(i));
       }
-      formData.set("folderId", this.data.currentFolder.id.toString());
+      const folderId = this.data.currentFolder.id;
+      formData.set("folderId", folderId.toString());
       this.data.uploadFiles(formData).subscribe(result => {
-        console.log("HEREEEEEEEEEE");
         console.log(result);
+        if (result.success === true) {
+          this.data.refreshFolder(folderId);
+        }
         inputElement.value = null;
       });
     }

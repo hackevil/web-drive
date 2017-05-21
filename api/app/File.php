@@ -12,7 +12,7 @@ class File extends Model
     protected $table = 'files';
 
     protected $fillable = [
-        'name', 'user_id', 'folder_id','type'
+        'name', 'user_id', 'folder_id','type', 'path', 'extension', 'size', 'mimeType'
     ];
 
     protected $dates = ['deleted_at'];

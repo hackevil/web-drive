@@ -22,8 +22,6 @@ export class ConnectionServiceProvider {
       this.headers.set("Authorization", "Bearer " + token);
       this.replaySubject.next(this.hasAuthToken);
     });
-
-    // this.headers.append('Content-Type', 'application/json');
   }
 
   public setAuthToken(token: string): Observable<boolean> {
@@ -55,16 +53,18 @@ export class ConnectionServiceProvider {
           this._getRequestArguments(params)).map(response => response.json());
   }
 
-  public send(endpoint: string, data?: any): Observable<string> {
+  public send(endpoint: string, data?: any, files=false): Observable<string> {
         return this.http.post(this._getUrl(endpoint), data,
-          this._getRequestArguments()).map(response => response.json());
+          this._getRequestArguments(null, files)).map(response => response.json());
   }
 
   private _getUrl(endpoint: string): string {
     return (this.server + endpoint);
   }
 
-  private _getRequestArguments(params?): RequestOptionsArgs {
+  private _getRequestArguments(params?, files?): RequestOptionsArgs {
+    this.headers.set('Content-Type', 'application/json');
+    if (files) this.headers.delete('Content-Type');
     let args = {
       headers: this.headers,
       responseType: ResponseContentType.Json
