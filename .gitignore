@@ -1,6 +1,7 @@
 node_modules/
-www/build/
-platforms/
-plugins/
 .DS_Store
+vendor
 .idea
+Homestead.json
+Homestead.yaml
+.env
