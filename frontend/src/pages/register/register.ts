@@ -22,9 +22,10 @@ export class RegisterPage {
   public register() {
     this.toggleLoading();
     this.errors.clear();
-    this.auth.register(this.registration).subscribe(result => {
+    const subscription = this.auth.register(this.registration).subscribe(result => {
       if (result.success === true) {
         this.loading.dismiss().then(() => {
+          subscription.unsubscribe();
           this.navCtrl.setRoot("MainPage");
         });
       } else {
@@ -70,7 +71,8 @@ export class RegisterPage {
     this.navBar.backButtonClick = (e:UIEvent) => {
       this.navCtrl.setRoot("WelcomePage")
     };
-    this.auth.isAuthenticated().subscribe(hasToken => {
+    const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
+      subscription.unsubscribe();
       if (hasToken === true) {
         this.navCtrl.setRoot("MainPage");
       }

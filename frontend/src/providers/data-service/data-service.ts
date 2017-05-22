@@ -47,7 +47,6 @@ export class DataServiceProvider {
   public clearSelected() {
     this.selected.clear();
     this.selectedIds.clear();
-
   }
 
   public enterFolder(folderId: number, parentId?: number) {
@@ -174,12 +173,48 @@ export class DataServiceProvider {
     });
   }
 
+  public restoreItems(selectedItems: Set<any>): Observable<any> {
+    return Observable.create(observer => {
+      let failedToRestore = [];
+      const count = selectedItems.size;
+      let completed = 0;
+
+      selectedItems.forEach(item => {
+        const [type, id] = [item.type, item.id];
+        this.connection.notify(type + "/restore/" + id).subscribe(
+          result => {
+            completed++;
+            if (result.status !== "success") {
+              failedToRestore.push({id: item.id, name: item.name});
+            }
+            if (completed === count) {
+              observer.next({success: true, failed: failedToRestore});
+              observer.complete();
+            }
+          },
+          error => {
+            completed++;
+            failedToRestore.push({id: item.id, name: item.name});
+            if (completed === count) {
+              observer.next({success: true, failed: failedToRestore});
+              observer.complete();
+            }
+          }
+        );
+      });
+    });
+  }
+
   public downloadItem(selectedItem: any): Observable<any> {
     const [type, id] = [selectedItem.type, selectedItem.id];
     return Observable.create(observer => {
       this.connection.download(type + "/download/" + id).subscribe(
         result => {
-          download(result, selectedItem.name + ".zip");
+          if (selectedItem.type === "file") {
+            download(result, selectedItem.name + "." + selectedItem.extension);
+          } else {
+            download(result, selectedItem.name + ".zip");
+          }
           observer.next({success: true});
           observer.complete();
         },

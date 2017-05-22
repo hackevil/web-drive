@@ -14,8 +14,9 @@ export class FilterPipe implements PipeTransform {
     const keepDeleted = (state === PageState.DELETED);
     return items.filter(item =>  {
       const lowercaseItem = item.name ? item.name.toLowerCase() : "";
-      return (lowercaseItem.includes(lowercaseFilter) &&
-        ((!item.deleted_at && !keepDeleted) || ((!!item.deleted_at) === keepDeleted)));
+      const otherFilter = ((item.type === "file")) ?
+        (keepDeleted ? (!!item.deleted_at) : !(!!item.deleted_at)) : true;
+      return (lowercaseItem.includes(lowercaseFilter) && otherFilter);
     });
   }
 }

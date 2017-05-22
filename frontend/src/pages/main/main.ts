@@ -22,13 +22,22 @@ export class MainPage {
 
   goToTrash() {
     this.data.state = PageState.DELETED;
-    this.data.selected.clear();
+    this.transitionPage();
   }
 
   goToFiles() {
     this.data.state = PageState.FILES;
-    this.data.selected.clear();
+    this.transitionPage();
   }
+
+  private transitionPage() {
+    this.data.clearSelected();
+    this.data.currentFolder.folders = [];
+    this.data.currentFolder.files = [];
+    this.data.folderLevels = [];
+    this.data.enterFolder(-1);
+  }
+
 
   chooseFiles() {
     let event: MouseEvent = new MouseEvent('click', {bubbles: false});
@@ -46,7 +55,6 @@ export class MainPage {
       const folderId = this.data.currentFolder.id;
       formData.set("folderId", folderId.toString());
       this.data.uploadFiles(formData).subscribe(result => {
-        console.log(result);
         if (result.success === true) {
           this.data.refreshFolder(folderId);
         }
@@ -61,7 +69,6 @@ export class MainPage {
   }
 
   ionViewDidLoad() {
-    console.log("ENTERING MAIN");
     this.goToFiles();
     const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
       subscription.unsubscribe();

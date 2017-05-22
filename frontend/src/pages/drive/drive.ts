@@ -33,10 +33,39 @@ export class DrivePage {
   }
 
   createFolder() {
-    const currentFolderId = this.currentFolder.id;
-    this.data.createFolder(currentFolderId, "test").subscribe(result => {
-      this.data.refreshFolder(currentFolderId);
+    let prompt = this.alertCtrl.create({
+      title: 'Create Folder',
+      inputs: [
+        {
+          name: 'name',
+          placeholder: 'Name'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel'
+        },
+        {
+          text: 'Save',
+          handler: data => {
+            if (data.name === "") return false;
+            prompt.dismiss().then(() => {
+              // Show spinner
+              const currentFolderId = this.currentFolder.id;
+              this.data.createFolder(currentFolderId, data.name).subscribe(result => {
+                if (result.success === true) {
+                  this.data.refreshFolder(currentFolderId);
+                }
+              });
+              // hide spinner
+              // clear selected
+            });
+            return false;
+          }
+        }
+      ]
     });
+    prompt.present();
   }
 
   exitFolder() {
@@ -84,7 +113,7 @@ export class DrivePage {
   deleteItems() {
     let alert = this.alertCtrl.create({
       title: 'Confirm delete',
-      message: 'Do you want to delete these items?',
+      message: 'Are you sure you want to delete these items?',
       buttons: [
         {
           text: 'Cancel',
@@ -112,6 +141,37 @@ export class DrivePage {
     alert.present();
   }
 
+  restoreItems() {
+    let alert = this.alertCtrl.create({
+      title: 'Confirm restore',
+      message: 'Aree you sure you want to restore these items?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Restore',
+          handler: () => {
+            alert.dismiss().then(() => {
+              // Show spinner
+              const currentFolderId = this.data.currentFolder.id;
+              this.data.restoreItems(this.selected).subscribe(result => {
+                if (result.success === true) {
+                  this.data.refreshFolder(currentFolderId);
+                }
+              });
+              // hide spinner
+              // clear selected
+            });
+            return false;
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
   downloadItem() {
     const selectedItem = this.selected.values().next().value;
     this.data.downloadItem(selectedItem).subscribe(result => {
@@ -122,15 +182,14 @@ export class DrivePage {
   shareItems() {
   }
 
-  presentPopover(myEvent) {
-    let popover = this.popoverCtrl.create("PopoverOptionsPage");
+  presentPopover(event) {
+    let popover = this.popoverCtrl.create("PopoverOptionsPage", {parent: this});
     popover.present({
-      ev: myEvent
+      ev: event
     });
   }
 
   ionViewDidLoad() {
-    console.log("ENTERING DRIVE");
     const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
       if (hasToken === true) {
         subscription.unsubscribe();

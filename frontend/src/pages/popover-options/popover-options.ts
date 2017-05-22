@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {IonicPage, ViewController} from 'ionic-angular';
+import {IonicPage, NavParams, ViewController} from 'ionic-angular';
 
 @IonicPage()
 @Component({
@@ -8,15 +8,13 @@ import {IonicPage, ViewController} from 'ionic-angular';
 })
 export class PopoverOptionsPage {
 
-  constructor(public viewCtrl: ViewController) {
+  private parent;
+
+  constructor(public viewCtrl: ViewController, private params: NavParams) {
+    this.parent = this.params.get("parent");
   }
 
   close() {
     this.viewCtrl.dismiss();
   }
-
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad PopoverOptionsPage');
-  }
-
 }

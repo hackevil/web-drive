@@ -18,7 +18,7 @@
           <ion-icon style="cursor:pointer; padding-right: 10px;"
                     *ngIf="data.folderLevels.length > 0" icon-left name="arrow-dropleft-circle"
                     (click)="exitFolder()"></ion-icon> Folders
-          <ion-icon style="cursor:pointer; padding-right: 10px;" icon-right name="add"
+          <ion-icon *ngIf="data.state === 5" style="cursor:pointer; margin-left: 10px;" icon-right name="add"
                     (click)="createFolder()"></ion-icon>
         </div>
       </div>
@@ -76,36 +76,43 @@
 <ion-footer>
   <ion-toolbar>
     <span class="hide-on-small" hideWhen="android,ios">
-      <button disabled *ngIf="selected.size > 0"
+      <button disabled *ngIf="(selected.size > 0) && (data.state === 5)"
               ion-button icon-left clear
               (click)="shareItems()">
         <ion-icon name="share" aria-label="share"></ion-icon>
         Share
       </button>
 
-      <button *ngIf="selected.size === 1"
+      <button *ngIf="(selected.size === 1) && (data.state === 5)"
               ion-button icon-left clear
               (click)="downloadItem()">
         <ion-icon name="cloud-download" aria-label="download"></ion-icon>
         Download
       </button>
 
-      <button *ngIf="selected.size > 0"
+      <button *ngIf="(selected.size > 0) && (data.state === 5)"
               ion-button icon-left clear
               (click)="deleteItems()">
         <ion-icon name="trash" aria-label="delete"></ion-icon>
         Delete
       </button>
 
-      <button *ngIf="selected.size === 1"
+      <button *ngIf="(selected.size === 1) && (data.state === 5)"
               ion-button icon-left clear
               (click)="renameItem()">
         <ion-icon name="create" aria-label="rename"></ion-icon>
         Rename
       </button>
+
+      <button *ngIf="(selected.size > 0) && (data.state === 15)"
+                    ion-button icon-left clear
+                    (click)="restoreItems()">
+        <ion-icon name="refresh" aria-label="restore"></ion-icon>
+        Restore
+      </button>
     </span>
 
-    <button *ngIf="selected.size > 0" class="hide-on-large"
+    <button class="hide-on-large"
             ion-button icon-only clear (click)="presentPopover($event)">
       <ion-icon name="more"></ion-icon>
     </button>

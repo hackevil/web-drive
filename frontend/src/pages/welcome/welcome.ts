@@ -18,8 +18,4 @@ export class WelcomePage {
   public goToRegister() {
     this.navCtrl.setRoot("RegisterPage");
   }
-
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad WelcomePage');
-  }
 }

@@ -3,10 +3,31 @@
 
   <ion-list>
     <ion-list-header>Actions</ion-list-header>
-    <button ion-item (click)="close()">Share</button>
-    <button ion-item (click)="close()">Download</button>
-    <button ion-item (click)="close()">Delete</button>
-    <button ion-item (click)="close()">Rename</button>
+    <button ion-item *ngIf="(parent.data.state === 5)"
+            (click)="parent.createFolder(); close()">
+      <ion-icon name="add" aria-label="add"></ion-icon>
+      Create Folder
+    </button>
+    <button ion-item *ngIf="(parent.selected.size === 1) && (parent.data.state === 5)"
+            (click)="parent.downloadItem(); close()">
+      <ion-icon name="cloud-download" aria-label="download"></ion-icon>
+      Download
+    </button>
+    <button ion-item *ngIf="(parent.selected.size > 0) && (parent.data.state === 5)"
+            (click)="parent.deleteItems(); close()">
+      <ion-icon name="trash" aria-label="delete"></ion-icon>
+      Delete
+    </button>
+    <button ion-item *ngIf="(parent.selected.size === 1) && (parent.data.state === 5)"
+            (click)="parent.renameItem(); close()">
+      <ion-icon name="create" aria-label="rename"></ion-icon>
+      Rename
+    </button>
+    <button ion-item *ngIf="(parent.selected.size > 0) && (parent.data.state === 15)"
+            (click)="parent.restoreItems(); close()">
+      <ion-icon name="refresh" aria-label="restore"></ion-icon>
+      Restore
+    </button>
   </ion-list>
 
 </ion-content>
