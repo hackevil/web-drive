@@ -44,7 +44,12 @@ class FileController extends Controller
         $totalSize = 0;
 
         foreach($files as $file) { //50MB Limit
-            $rules = array('file' => 'required|file|max:50000');
+            $rules = array('file' => 'required|file|mimetypes:application/csv,application/excel,' .
+                'application/vnd.ms-excel,application/vnd.msexcel,text/csv,text/anytext,text/plain,text/x-c,' .
+                'text/comma-separated-values,inode/x-empty,application/pdf,application/json,application/msword,' .
+                'application/vnd.ms-powerpoint,application/x-latex,' .
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-mspublisher,' .
+                'audio/x-wav,image/gif,image/png,image/bmp,image/jpeg,text/html|max:50000');
             $validator = Validator::make(array('file'=> $file), $rules);
             if($validator->passes()) {
                 $path = Storage::putFile($folderPath, $file);
@@ -111,11 +116,3 @@ class FileController extends Controller
         }
     }
 }
-
-//
-//|mimetypes:application/csv,application/excel,' .
-//                'application/vnd.ms-excel,application/vnd.msexcel,text/csv,text/anytext,text/plain,text/x-c,' .
-//                'text/comma-separated-values,inode/x-empty,application/pdf,application/json,application/msword,' .
-//                'application/vnd.ms-powerpoint,application/x-latex,' .
-//                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-mspublisher,' .
-//                'audio/x-wav,image/gif,image/png,image/bmp,image/jpeg,text/html
