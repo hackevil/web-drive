@@ -49,17 +49,18 @@ export class DataServiceProvider {
     this.selectedIds.clear();
   }
 
-  public loadTrash() {
+  public loadTrash(warning?: Function) {
     this.connection.notify("trashed").subscribe(
         result => {
           this.setCurrentFolder(null, {files: result.files, folders: result.folders});
         },
         error => {
+          if (warning) warning();
         }
     );
   }
 
-  public enterFolder(folderId: number, parentId?: number) {
+  public enterFolder(folderId: number, parentId?: number, warning?: Function) {
     folderId = (folderId === null) ? -1 : folderId;
     parentId = (parentId === null) ? -1 : parentId;
     this.loadFolder(folderId).subscribe(result => {
@@ -68,6 +69,8 @@ export class DataServiceProvider {
         this.folders.set(folderId, {files: result.files, folders: result.folders});
         this.setCurrentFolder(folderId, result);
         if (folderId > -1) this.folderLevels.push(parentId);
+      } else {
+        if (warning) warning();
       }
     })
   }

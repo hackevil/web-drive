@@ -56,6 +56,15 @@ export class DrivePage {
     this.loading.dismiss();
   }
 
+  private displayWarning(title: string, subTitle: string) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subTitle,
+      buttons: ['Dismiss']
+    });
+    alert.present();
+  }
+
   createFolder() {
     let prompt = this.alertCtrl.create({
       title: 'Create Folder',
@@ -79,6 +88,8 @@ export class DrivePage {
               this.data.createFolder(currentFolderId, data.name).subscribe(result => {
                 if (result.success === true) {
                   this.data.refreshFolder(currentFolderId);
+                } else {
+                  this.displayWarning("Error creating folder.", "Please check your connection.");
                 }
                 this.stopLoading();
               });
@@ -120,6 +131,8 @@ export class DrivePage {
               this.data.renameItem(selectedItem, data.name).subscribe(result => {
                 if (result.success === true) {
                   this.data.refreshFolder(currentFolderId);
+                } else {
+                  this.displayWarning("Error renaming file.", "Please check your connection.");
                 }
                 this.stopLoading();
               });
@@ -150,9 +163,12 @@ export class DrivePage {
               this.data.deleteItems(this.selected).subscribe(result => {
                 if (result.success === true) {
                   this.data.refreshFolder(currentFolderId);
+                } else {
+                  this.displayWarning("Error deleting your files.", "Please check your connection.");
                 }
                 this.stopLoading();
-              });
+              },
+              error => this.displayWarning("Error deleting your files", "Check your connection"));
             });
             return false;
           }
@@ -179,6 +195,8 @@ export class DrivePage {
               this.data.restoreItems(this.selected).subscribe(result => {
                 if (result.success === true) {
                   this.data.loadTrash();
+                } else {
+                  this.displayWarning("Error restoring your files.", "Please try again.");
                 }
                 this.stopLoading();
               });
@@ -212,7 +230,8 @@ export class DrivePage {
     this.auth.isAuthenticated().then(hasToken => {
       if (hasToken === true) {
         this.startLoading();
-        this.data.enterFolder(-1);
+        this.data.enterFolder(-1, null,
+            () => this.displayWarning("Unable to load your drive.", "Please check your connection"));
         this.stopLoading();
       }
     });

@@ -25,14 +25,16 @@ export class MainPage {
   goToTrash() {
     this.data.state = PageState.DELETED;
     this.transitionPage();
-    this.data.loadTrash();
+    this.data.loadTrash(
+        () => this.displayWarning("Unable to load your drive.", "Please check your connection"));
     this.stopLoading();
   }
 
   goToFiles() {
     this.data.state = PageState.FILES;
     this.transitionPage();
-    this.data.enterFolder(-1);
+    this.data.enterFolder(-1, null,
+        () => this.displayWarning("Unable to load your drive.", "Please check your connection"));
     this.stopLoading();
   }
 
@@ -55,7 +57,6 @@ export class MainPage {
   private stopLoading() {
     this.loading.dismiss();
   }
-
 
   chooseFiles() {
     let event: MouseEvent = new MouseEvent('click', {bubbles: false});

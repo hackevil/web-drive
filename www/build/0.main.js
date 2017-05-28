@@ -105,6 +105,14 @@ var DrivePage = (function () {
     DrivePage.prototype.stopLoading = function () {
         this.loading.dismiss();
     };
+    DrivePage.prototype.displayWarning = function (title, subTitle) {
+        var alert = this.alertCtrl.create({
+            title: title,
+            subTitle: subTitle,
+            buttons: ['Dismiss']
+        });
+        alert.present();
+    };
     DrivePage.prototype.createFolder = function () {
         var _this = this;
         var prompt = this.alertCtrl.create({
@@ -130,6 +138,9 @@ var DrivePage = (function () {
                             _this.data.createFolder(currentFolderId, data.name).subscribe(function (result) {
                                 if (result.success === true) {
                                     _this.data.refreshFolder(currentFolderId);
+                                }
+                                else {
+                                    _this.displayWarning("Error creating folder.", "Please check your connection.");
                                 }
                                 _this.stopLoading();
                             });
@@ -172,6 +183,9 @@ var DrivePage = (function () {
                                 if (result.success === true) {
                                     _this.data.refreshFolder(currentFolderId);
                                 }
+                                else {
+                                    _this.displayWarning("Error renaming file.", "Please check your connection.");
+                                }
                                 _this.stopLoading();
                             });
                         });
@@ -202,8 +216,11 @@ var DrivePage = (function () {
                                 if (result.success === true) {
                                     _this.data.refreshFolder(currentFolderId);
                                 }
+                                else {
+                                    _this.displayWarning("Error deleting your files.", "Please check your connection.");
+                                }
                                 _this.stopLoading();
-                            });
+                            }, function (error) { return _this.displayWarning("Error deleting your files", "Check your connection"); });
                         });
                         return false;
                     }
@@ -230,6 +247,9 @@ var DrivePage = (function () {
                             _this.data.restoreItems(_this.selected).subscribe(function (result) {
                                 if (result.success === true) {
                                     _this.data.loadTrash();
+                                }
+                                else {
+                                    _this.displayWarning("Error restoring your files.", "Please try again.");
                                 }
                                 _this.stopLoading();
                             });
@@ -262,7 +282,7 @@ var DrivePage = (function () {
         this.auth.isAuthenticated().then(function (hasToken) {
             if (hasToken === true) {
                 _this.startLoading();
-                _this.data.enterFolder(-1);
+                _this.data.enterFolder(-1, null, function () { return _this.displayWarning("Unable to load your drive.", "Please check your connection"); });
                 _this.stopLoading();
             }
         });
@@ -275,8 +295,8 @@ DrivePage = __decorate([
         selector: 'page-drive',template:/*ion-inline-start:"C:\Users\Media-PC\Documents\code-uni\infs3202\frontend\src\pages\drive\drive.html"*/'<ion-header>\n\n  <ion-navbar>\n\n    <button ion-button menuToggle>\n\n      <ion-icon name="menu"></ion-icon>\n\n    </button>\n\n    <ion-searchbar [(ngModel)]="searchText">\n\n    </ion-searchbar>\n\n  </ion-navbar>\n\n</ion-header>\n\n\n\n\n\n<ion-content padding>\n\n\n\n  <div class="row drive-title folders">\n\n    <div class="col-xs-12" >\n\n      <div class="panel panel-default" style="border-radius: 0">\n\n        <div class="panel-heading">\n\n          <ion-icon style="cursor:pointer; padding-right: 10px;"\n\n                    *ngIf="data.folderLevels.length > 0" icon-left name="arrow-dropleft-circle"\n\n                    (tap)="exitFolder()"></ion-icon> Folders\n\n          <ion-icon *ngIf="data.state === 5" style="cursor:pointer; margin-left: 10px;" icon-right name="add"\n\n                    (tap)="createFolder()"></ion-icon>\n\n        </div>\n\n      </div>\n\n    </div>\n\n  </div>\n\n\n\n  <div class="row">\n\n    <div *ngFor="let folder of currentFolder.folders | filter:searchText:data.state"\n\n         class="folder col-lg-2 col-md-4 col-sm-6 col-xs-12">\n\n      <div class="panel panel-default">\n\n        <div class="panel-heading text-center folder-header">\n\n          <ion-checkbox class="item-checkbox"\n\n                        [checked]="selected.has(folder)"\n\n                        (click)="updateSelectedItems(folder)">\n\n          </ion-checkbox>\n\n          <ion-icon name="briefcase" class="fa-5x"></ion-icon>\n\n        </div>\n\n        <div class="panel-body text-muted folder-title truncate" (tap)="enterFolder(folder.id, folder.folder_id)">\n\n          {{folder.name}}\n\n        </div>\n\n      </div>\n\n    </div>\n\n  </div>\n\n\n\n  <div class="row drive-title files">\n\n    <div class="col-xs-12">\n\n      <div class="panel panel-default" style="border-radius: 0">\n\n        <div class="panel-heading">Files</div>\n\n      </div>\n\n    </div>\n\n  </div>\n\n\n\n  <div class="row">\n\n    <div *ngFor="let file of currentFolder.files | filter:searchText:data.state"\n\n         class="file col-lg-2 col-md-4 col-sm-6 col-xs-12">\n\n      <div class="panel panel-default">\n\n        <div class="panel-heading text-center file-header">\n\n          <ion-checkbox class="item-checkbox"\n\n                        [checked]="selected.has(file)"\n\n                        (click)="updateSelectedItems(file)">\n\n          </ion-checkbox>\n\n          <ion-icon name="document" class="fa-5x"></ion-icon>\n\n        </div>\n\n        <div class="panel-body text-muted file-title truncate">\n\n          {{file.name}}\n\n        </div>\n\n      </div>\n\n    </div>\n\n  </div>\n\n\n\n  <!--<h5 hideWhen="android,ios" class="text-center text-muted">Drag Files here to upload.</h5>-->\n\n\n\n</ion-content>\n\n\n\n<ion-footer>\n\n  <ion-toolbar>\n\n    <span class="hide-on-small" hideWhen="android,ios">\n\n      <button disabled *ngIf="(selected.size > 0) && (data.state === 5)"\n\n              ion-button icon-left clear\n\n              (tap)="shareItems()">\n\n        <ion-icon name="share" aria-label="share"></ion-icon>\n\n        Share\n\n      </button>\n\n\n\n      <button *ngIf="(selected.size === 1) && (data.state === 5)"\n\n              ion-button icon-left clear\n\n              (tap)="downloadItem()">\n\n        <ion-icon name="cloud-download" aria-label="download"></ion-icon>\n\n        Download\n\n      </button>\n\n\n\n      <button *ngIf="(selected.size > 0) && (data.state === 5)"\n\n              ion-button icon-left clear\n\n              (tap)="deleteItems()">\n\n        <ion-icon name="trash" aria-label="delete"></ion-icon>\n\n        Delete\n\n      </button>\n\n\n\n      <button *ngIf="(selected.size === 1) && (data.state === 5)"\n\n              ion-button icon-left clear\n\n              (tap)="renameItem()">\n\n        <ion-icon name="create" aria-label="rename"></ion-icon>\n\n        Rename\n\n      </button>\n\n\n\n      <button *ngIf="(selected.size > 0) && (data.state === 15)"\n\n                    ion-button icon-left clear\n\n                    (tap)="restoreItems()">\n\n        <ion-icon name="refresh" aria-label="restore"></ion-icon>\n\n        Restore\n\n      </button>\n\n    </span>\n\n\n\n    <button class="hide-on-large"\n\n            ion-button icon-only clear (tap)="presentPopover($event)">\n\n      <ion-icon name="more"></ion-icon>\n\n    </button>\n\n\n\n    <button *ngIf="selected.size > 0" class="pull-right"\n\n            ion-button icon-right clear end\n\n            (tap)="data.clearSelected()">\n\n      <ion-icon name="close" aria-label="unselect"></ion-icon>\n\n      {{selected.size}} Selected\n\n    </button>\n\n\n\n  </ion-toolbar>\n\n</ion-footer>\n\n\n\n\n\n\n\n\n\n'/*ion-inline-end:"C:\Users\Media-PC\Documents\code-uni\infs3202\frontend\src\pages\drive\drive.html"*/
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["l" /* PopoverController */], __WEBPACK_IMPORTED_MODULE_2__providers_data_service_data_service__["a" /* DataServiceProvider */],
-        __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__providers_auth_service_auth_service__["a" /* AuthServiceProvider */],
-        __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]])
+        __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__providers_auth_service_auth_service__["a" /* AuthServiceProvider */],
+        __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* LoadingController */]])
 ], DrivePage);
 
 //# sourceMappingURL=drive.js.map
