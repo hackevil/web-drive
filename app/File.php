@@ -25,4 +25,9 @@ class File extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    public function parentFolder()
+    {
+        return $this->belongsTo('App\Folder', 'folder_id');
+    }
 }

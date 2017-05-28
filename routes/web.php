@@ -19,6 +19,10 @@ $app->post("login","UserController@authenticate");
 $app->post("register", "UserController@register");
 
 $app->group(['middleware' => ['auth']], function () use ($app) {
+
+    $app->get("trashed", "UserController@trashed");
+    $app->get("user", "UserController@getDetails");
+
     $app->group(['prefix' => "file"], function () use ($app) {
         $app->get("/download/{id}", "FileController@download");
         $app->post("/rename/{id}", "FileController@rename");

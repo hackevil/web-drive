@@ -28,6 +28,11 @@ class Folder extends Model
         return $this->belongsTo('App\User');
     }
 
+    public function parentFolder()
+    {
+        return $this->belongsTo('App\Folder', 'folder_id');
+    }
+
     public function files()
     {
         return $this->hasMany('App\File','folder_id');

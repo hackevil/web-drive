@@ -32,13 +32,24 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function folders($folderId = null)
     {
-        return $this->hasMany('App\Folder','user_id')->withTrashed()
-            ->where("folder_id", $folderId)->get();
+        return $this->hasMany('App\Folder','user_id')->where("folder_id", $folderId)->get();
     }
 
     public function files($folderId = null)
     {
-        return $this->hasMany('App\File','user_id')->withTrashed()
-            ->where("folder_id", $folderId)->get();
+        return $this->hasMany('App\File','user_id')->where("folder_id", $folderId)->get();
+    }
+
+    public function trashedFolders()
+    {
+        return $this->hasMany('App\Folder', 'user_id')->onlyTrashed()->where(function($query) {
+            $query->whereHas("parentFolder")->orWhere("folder_id", null);
+        })->get();
+    }
+
+    public function trashedFiles() {
+        return $this->hasMany('App\File', 'user_id')->onlyTrashed()->where(function($query) {
+            $query->whereHas("parentFolder")->orWhere("folder_id", null);
+        })->get();
     }
 }

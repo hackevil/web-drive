@@ -32,7 +32,7 @@ class UserController extends Controller
             $apiToken = base64_encode(str_random(60));
             $user->api_token = $apiToken;
             $user->save();
-            return response()->json(["status" => "success", "api_token" => $apiToken, "user" => $user], 200);
+            return response()->json(["status" => "success", "api_token" => $apiToken], 200);
         } else {
             return response()->json(["status" => "fail"], 401);
         }
@@ -58,7 +58,17 @@ class UserController extends Controller
             "api_token" => $apiToken
         ]);
 
-        return response()->json(["status" => "success", "api_token" => $apiToken,
-            "user" => User::find($user->id)], 200);
+        return response()->json(["status" => "success", "api_token" => $apiToken], 200);
+    }
+
+    public function trashed(Request $request) {
+        $user = $request->user();
+        $files = $user->trashedFiles();
+        $folders = $user->trashedFolders();
+        return response()->json(["status" => "success", "files" => $files, "folders" => $folders], 200);
+    }
+
+    public function getDetails(Request $request) {
+        return response()->json(["status" => "success", "user" => $request->user()], 200);
     }
 }

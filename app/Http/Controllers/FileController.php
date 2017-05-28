@@ -27,10 +27,10 @@ class FileController extends Controller
 
     public function uploads(Request $request)
     {
-        $userId = $request->user()->id;
+        $user = $request->user();
         $files = Input::file('files');
         $folderId = $request->input("folderId");
-        $folderPath = "drive-" . $userId;
+        $folderPath = "drive-" . $user->id;
         if ($folderId > -1) {
             $folder = Folder::find($folderId);
             if (!$folder) return response()->json(["status" => "fail"], 200);
@@ -41,9 +41,15 @@ class FileController extends Controller
         $uploaded = 0;
         $failed = array();
 
+        $totalSize = 0;
+
         foreach($files as $file) { //50MB Limit
-            $rules = array('file' =>
-                'required|file|mimes:png,gif,jpeg,bmp,txt,pdf,pub,doc,docx,ico,xlsx,xls,ppt,pptx,html,css|max:50000');
+            $rules = array('file' => 'required|file|mimetypes:application/csv,application/excel,' .
+                'application/vnd.ms-excel,application/vnd.msexcel,text/csv,text/anytext,text/plain,text/x-c,' .
+                'text/comma-separated-values,inode/x-empty,application/pdf,application/json,application/msword,' .
+                'application/vnd.ms-powerpoint,application/x-latex,' .
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-mspublisher,' .
+                'audio/x-wav,image/gif,image/png,image/bmp,image/jpeg,text/html|max:50000');
             $validator = Validator::make(array('file'=> $file), $rules);
             if($validator->passes()) {
                 $path = Storage::putFile($folderPath, $file);
@@ -52,20 +58,25 @@ class FileController extends Controller
                     "extension" => $file->getClientOriginalExtension(),
                     "size" => $file->getSize(),
                     "mimeType" => $file->getMimeType(),
-                    "user_id" => $userId,
+                    "user_id" => $user->id,
                     "folder_id" => ($folderId < 0) ? null : $folderId,
                     "path" => $path
                 ]);
+                $totalSize = ($totalSize + $file->getSize());
                 $uploaded++;
             } else {
                 $failed[] = [$validator->messages()];
             }
         }
 
+        $user->used = ($user->used + $totalSize);
+        $user->save();
+
         if($uploaded == $count) {
-            return response()->json(["status" => "success"]);
+            return response()->json(["status" => "success", "usage" => $user->used]);
         } else {
-            return response()->json(["status" => "fail", "failed" => $failed, "count" => ($uploaded - $count)]);
+            return response()->json(["status" => "fail", "failed" => $failed, 
+                "usage" => $user->used, "count" => ($count - $uploaded)]);
         }
     }
 

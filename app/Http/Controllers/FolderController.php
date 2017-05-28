@@ -13,7 +13,8 @@ class FolderController extends Controller
         if ($folderId < 0) $folderId = null;
         $files = $user->files($folderId);
         $folders = $user->folders($folderId);
-        return response()->json(["status" => "success", "files" => $files, "folders" => $folders], 200);
+        return response()->json(["status" => "success", "files" => $files, "folders" => $folders,
+            "usage" => $user->used], 200);
     }
 
     public function create(Request $request, $parentFolderId)
