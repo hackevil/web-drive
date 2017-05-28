@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {AlertController, IonicPage, PopoverController} from 'ionic-angular';
-import {DataServiceProvider} from "../../providers/data-service/data-service";
+import {AlertController, IonicPage, Loading, LoadingController, PopoverController} from 'ionic-angular';
+import {DataServiceProvider, PageState} from "../../providers/data-service/data-service";
 import {AuthServiceProvider} from "../../providers/auth-service/auth-service";
 
 @IonicPage()
@@ -15,9 +15,11 @@ export class DrivePage {
 
   private selected;
   private selectedIds;
+  private loading: Loading;
 
   constructor(private popoverCtrl: PopoverController, private data: DataServiceProvider,
-              private alertCtrl: AlertController, private auth: AuthServiceProvider) {
+              private alertCtrl: AlertController, private auth: AuthServiceProvider,
+              private loadingCtrl: LoadingController) {
     this.currentFolder = this.data.currentFolder;
     this.selected = this.data.selected;
     this.selectedIds = this.data.selectedIds;
@@ -29,7 +31,29 @@ export class DrivePage {
   }
 
   enterFolder(folderId: number, parentId?: number, ) {
-    this.data.enterFolder(folderId, parentId);
+    if (this.data.state === PageState.DELETED) {
+      let alert = this.alertCtrl.create({
+        title: 'This folder is in your trash',
+        subTitle: 'To view this folder you must restore it.',
+        buttons: ['Dismiss']
+      });
+      alert.present();
+    }
+    if (this.data.state === PageState.FILES) {
+      this.data.enterFolder(folderId, parentId);
+    }
+  }
+
+  public startLoading() {
+    this.loading = this.loadingCtrl.create({
+      dismissOnPageChange: true,
+      content: "Loading..."
+    });
+    this.loading.present();
+  }
+
+  private stopLoading() {
+    this.loading.dismiss();
   }
 
   createFolder() {
@@ -50,15 +74,14 @@ export class DrivePage {
           handler: data => {
             if (data.name === "") return false;
             prompt.dismiss().then(() => {
-              // Show spinner
+              this.startLoading();
               const currentFolderId = this.currentFolder.id;
               this.data.createFolder(currentFolderId, data.name).subscribe(result => {
                 if (result.success === true) {
                   this.data.refreshFolder(currentFolderId);
                 }
+                this.stopLoading();
               });
-              // hide spinner
-              // clear selected
             });
             return false;
           }
@@ -92,15 +115,14 @@ export class DrivePage {
           handler: data => {
             if (data.name === "") return false;
             prompt.dismiss().then(() => {
-              // Show spinner
+              this.startLoading();
               const currentFolderId = this.data.currentFolder.id;
               this.data.renameItem(selectedItem, data.name).subscribe(result => {
                 if (result.success === true) {
                   this.data.refreshFolder(currentFolderId);
                 }
+                this.stopLoading();
               });
-              // hide spinner
-              // clear selected
             });
             return false;
           }
@@ -113,7 +135,7 @@ export class DrivePage {
   deleteItems() {
     let alert = this.alertCtrl.create({
       title: 'Confirm delete',
-      message: 'Are you sure you want to delete these items?',
+      subTitle: 'Are you sure you want to continue?',
       buttons: [
         {
           text: 'Cancel',
@@ -123,15 +145,14 @@ export class DrivePage {
           text: 'Delete',
           handler: () => {
             alert.dismiss().then(() => {
-              // Show spinner
+              this.startLoading();
               const currentFolderId = this.data.currentFolder.id;
               this.data.deleteItems(this.selected).subscribe(result => {
                 if (result.success === true) {
                   this.data.refreshFolder(currentFolderId);
                 }
+                this.stopLoading();
               });
-              // hide spinner
-              // clear selected
             });
             return false;
           }
@@ -144,7 +165,7 @@ export class DrivePage {
   restoreItems() {
     let alert = this.alertCtrl.create({
       title: 'Confirm restore',
-      message: 'Aree you sure you want to restore these items?',
+      subTitle: 'Are you sure you want to continue?',
       buttons: [
         {
           text: 'Cancel',
@@ -154,15 +175,13 @@ export class DrivePage {
           text: 'Restore',
           handler: () => {
             alert.dismiss().then(() => {
-              // Show spinner
-              const currentFolderId = this.data.currentFolder.id;
+              this.startLoading();
               this.data.restoreItems(this.selected).subscribe(result => {
                 if (result.success === true) {
-                  this.data.refreshFolder(currentFolderId);
+                  this.data.loadTrash();
                 }
+                this.stopLoading();
               });
-              // hide spinner
-              // clear selected
             });
             return false;
           }
@@ -190,10 +209,11 @@ export class DrivePage {
   }
 
   ionViewDidLoad() {
-    const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
+    this.auth.isAuthenticated().then(hasToken => {
       if (hasToken === true) {
-        subscription.unsubscribe();
+        this.startLoading();
         this.data.enterFolder(-1);
+        this.stopLoading();
       }
     });
   }

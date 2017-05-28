@@ -31,13 +31,14 @@ page-main {
   }
 
   #usage-wrapper #usage-container {
+    overflow: hidden;
     height: 5px;
     border: 1px solid black;
   }
 
   #usage-wrapper #usage-container #usage {
     height: 100%;
-    width: 0%;
+    width: 0;
     background-color: greenyellow;
   }
 

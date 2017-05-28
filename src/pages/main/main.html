@@ -11,29 +11,29 @@
       </ion-header>
       <ion-content>
         <ion-list>
-          <button (click)="goToFiles()" ion-item>
+          <button (tap)="goToFiles()" ion-item>
             <ion-icon name="document" item-left></ion-icon>My Files
             <ion-icon *ngIf="data.state === 5" name="star-half" item-right></ion-icon>
           </button>
-          <button ion-item disabled>
-            <ion-icon name="share" item-left></ion-icon>Shared
-            <ion-icon *ngIf="data.state === 10" name="star-half" item-right></ion-icon>
-          </button>
-          <button (click)="goToTrash()" ion-item>
+          <!--<button ion-item disabled>-->
+            <!--<ion-icon name="share" item-left></ion-icon>Shared-->
+            <!--<ion-icon *ngIf="data.state === 10" name="star-half" item-right></ion-icon>-->
+          <!--</button>-->
+          <button (tap)="goToTrash()" ion-item>
             <ion-icon name="trash" item-left></ion-icon>Trash
             <ion-icon *ngIf="data.state === 15" name="star-half" item-right></ion-icon>
           </button>
-          <button (click)="chooseFiles()" ion-item>
+          <button (tap)="chooseFiles()" ion-item>
             <ion-icon name="cloud-upload" item-left></ion-icon>Upload
             <input #fileInput (change)="fileInputChangeEvent()" type="file" accept="*" id="uploaded" multiple/>
           </button>
-          <button (click)="logout()" ion-item>
+          <button (tap)="logout()" ion-item>
             <ion-icon name="exit" item-left></ion-icon>Logout
           </button>
         </ion-list>
 
         <div *ngIf="currentUser" id="usage-wrapper">
-          <span>{{currentUser.usage}}GB out of {{currentUser.allocated}}GB used. ({{currentUser.usagePercent}}%)</span>
+          <span>{{currentUser.usage}}MB out of {{currentUser.allocated}}MB used. ({{currentUser.usagePercent}}%)</span>
           <div id="usage-container">
             <div id="usage" [style.width.%]="currentUser.usagePercent"></div>
           </div>

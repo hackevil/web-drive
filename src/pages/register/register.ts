@@ -71,8 +71,7 @@ export class RegisterPage {
     this.navBar.backButtonClick = (e:UIEvent) => {
       this.navCtrl.setRoot("WelcomePage")
     };
-    const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
-      subscription.unsubscribe();
+    this.auth.isAuthenticated().then(hasToken => {
       if (hasToken === true) {
         this.navCtrl.setRoot("MainPage");
       }

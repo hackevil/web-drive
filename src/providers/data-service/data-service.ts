@@ -49,6 +49,16 @@ export class DataServiceProvider {
     this.selectedIds.clear();
   }
 
+  public loadTrash() {
+    this.connection.notify("trashed").subscribe(
+        result => {
+          this.setCurrentFolder(null, {files: result.files, folders: result.folders});
+        },
+        error => {
+        }
+    );
+  }
+
   public enterFolder(folderId: number, parentId?: number) {
     folderId = (folderId === null) ? -1 : folderId;
     parentId = (parentId === null) ? -1 : parentId;
@@ -104,7 +114,7 @@ export class DataServiceProvider {
     this.currentFolder.folders = folder.folders;
   }
 
-  public loadFolder(folderId: number): Observable<any> {
+  private loadFolder(folderId: number): Observable<any> {
     return Observable.create(observer => {
       this.connection.notify("folder/contents/" + folderId).subscribe(
         result => this.handleLoadFolder(result, observer),
@@ -240,10 +250,10 @@ export class DataServiceProvider {
 
   private handleFilesUpload(result, observer) {
     if (result.status === "success") {
-      observer.next({success: true, result: result});
+      observer.next({success: true, result: result, usage: result.usage});
       observer.complete();
     } else if (result.status === "fail") {
-      observer.next({success: true, failed: result.failed, count: result.count});
+      observer.next({success: true, failed: result.failed, usage: result.usage, count: result.count});
       observer.complete();
     }
 

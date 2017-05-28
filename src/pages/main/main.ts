@@ -1,5 +1,5 @@
 import {Component, ViewChild} from '@angular/core';
-import {IonicPage, NavController} from 'ionic-angular';
+import {AlertController, IonicPage, Loading, LoadingController, NavController} from 'ionic-angular';
 import {AuthServiceProvider, User} from "../../providers/auth-service/auth-service";
 import {DataServiceProvider, PageState} from "../../providers/data-service/data-service";
 
@@ -14,28 +14,46 @@ export class MainPage {
 
   public activePage = "DrivePage";
   private currentUser: User;
+  private loading: Loading;
 
   constructor(private auth: AuthServiceProvider, private data: DataServiceProvider,
-              public navCtrl: NavController) {
+              public navCtrl: NavController, private loadingCtrl: LoadingController,
+              private alertCtrl: AlertController) {
     this.currentUser = this.auth.authUser;
   }
 
   goToTrash() {
     this.data.state = PageState.DELETED;
     this.transitionPage();
+    this.data.loadTrash();
+    this.stopLoading();
   }
 
   goToFiles() {
     this.data.state = PageState.FILES;
     this.transitionPage();
+    this.data.enterFolder(-1);
+    this.stopLoading();
   }
 
   private transitionPage() {
+    this.startLoading();
     this.data.clearSelected();
     this.data.currentFolder.folders = [];
     this.data.currentFolder.files = [];
     this.data.folderLevels = [];
-    this.data.enterFolder(-1);
+  }
+
+  public startLoading() {
+    this.loading = this.loadingCtrl.create({
+      dismissOnPageChange: true,
+      content: "Loading..."
+    });
+    this.loading.present();
+  }
+
+  private stopLoading() {
+    this.loading.dismiss();
   }
 
 
@@ -52,15 +70,35 @@ export class MainPage {
       for (let i = 0; i < count; i++) {
         formData.append('files[]', inputElement.files.item(i));
       }
-      const folderId = this.data.currentFolder.id;
+      let folderId = this.data.currentFolder.id;
+      if (!folderId) folderId = -1;
       formData.set("folderId", folderId.toString());
       this.data.uploadFiles(formData).subscribe(result => {
         if (result.success === true) {
-          this.data.refreshFolder(folderId);
+          this.currentUser.usage = parseFloat(result.usage);
+          if (this.data.state === PageState.FILES) {
+            this.data.refreshFolder(folderId);
+          }
+          if (result.failed) {
+            this.displayWarning("Error uploading " + result.count +
+                " file(s).", "Some files types are not supported.")
+          }
+        }
+        if (result.success === false) {
+          this.displayWarning("Failed to upload files.", "Please check your connection.")
         }
         inputElement.value = null;
       });
     }
+  }
+
+  private displayWarning(title: string, subTitle: string) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subTitle,
+      buttons: ['Dismiss']
+    });
+    alert.present();
   }
 
   logout() {
@@ -69,12 +107,11 @@ export class MainPage {
   }
 
   ionViewDidLoad() {
-    this.goToFiles();
-    const subscription = this.auth.isAuthenticated().subscribe(hasToken => {
-      subscription.unsubscribe();
+    this.auth.isAuthenticated().then(hasToken => {
       if (hasToken === true) {
-        // Load user from server.
-        this.currentUser = this.auth.loadAuthenticatedUser();
+        this.auth.loadAuthenticatedUser().subscribe(
+            result => this.currentUser = this.auth.authUser
+        );
       } else {
         this.logout();
       }

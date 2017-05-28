@@ -8,13 +8,13 @@ export class User {
   private _id: number;
   private _name: string;
   private _email: string;
-  public usage: number;
+  public _usage: number;
 
   constructor(id: number, name: string, email: string, usage: number) {
     this._id = id;
     this._name = name;
     this._email = email;
-    this.usage = usage;
+    this._usage = usage;
   }
 
   get id() {
@@ -30,11 +30,21 @@ export class User {
   }
 
   get allocated() {
-    return 10; //GB
+    return 10; //MB
+  }
+
+  get usage() {
+    let usage = (this._usage / 1000000);
+    return Number((usage).toFixed(4));
+  }
+
+  set usage(usage) {
+    this._usage = usage;
   }
 
   get usagePercent() {
-    return (this.usage / this.allocated) * 100;
+    let percent = (this.usage / this.allocated) * 100;
+    return Number((percent).toFixed(3));
   }
 }
 
@@ -69,8 +79,6 @@ export class AuthServiceProvider {
 
   private handleLoginRegisterResponse(result, observer) {
     if (result.status === "success") {
-      const user = result.user;
-      this.authUser = new User(user.id, user.name, user.email, user.used);
       const token = result.api_token;
       this.connection.setAuthToken(token).subscribe(() => {
         observer.next({success: true});
@@ -95,14 +103,28 @@ export class AuthServiceProvider {
     });
   }
 
-  public loadAuthenticatedUser(): User {
-    // TODO: Load the user from the server. Helps with refresh.
-    // Don't send the user with the login anymore.
-    return this.authUser;
+  public loadAuthenticatedUser(): Observable<User> {
+    return Observable.create(observer => {
+      this.connection.notify("user").subscribe(
+          result => {
+            const user = result.user;
+            this.authUser = new User(user.id, user.name, user.email, user.used);
+            observer.next(this.authUser);
+            observer.complete();
+          },
+          error => observer.complete()
+      );
+    });
   }
 
-  public isAuthenticated(): Observable<boolean> {
-    return this.connection.hasAuthTokenSet()
+  async isAuthenticated(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      return this.connection.hasAuthTokenSet().subscribe(
+          result => resolve(result),
+          error => reject(error)
+      );
+    });
+
   }
 
 }
