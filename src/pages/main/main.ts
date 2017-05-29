@@ -64,6 +64,7 @@ export class MainPage {
   }
 
   fileInputChangeEvent() {
+    this.startLoading();
     const inputElement: HTMLInputElement = this.fileInput.nativeElement;
     let count: number = inputElement.files.length;
     let formData = new FormData();
@@ -88,6 +89,7 @@ export class MainPage {
         if (result.success === false) {
           this.displayWarning("Failed to upload files.", "Please check your connection.")
         }
+        this.stopLoading();
         inputElement.value = null;
       });
     }

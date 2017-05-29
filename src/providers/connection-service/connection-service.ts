@@ -10,6 +10,7 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 export class ConnectionServiceProvider {
 
   private hasAuthToken: boolean = false;
+  // private devServer: string = "http://webdrive.dev/";
   private server: string = "https://api.webdrive.site/";
   private headers: Headers = new Headers();
 

@@ -10,14 +10,12 @@ import { AuthServiceProvider } from '../providers/auth-service/auth-service';
 import { ConnectionServiceProvider } from '../providers/connection-service/connection-service';
 import { DataServiceProvider } from '../providers/data-service/data-service';
 import { IonicStorageModule } from '@ionic/storage';
-import { RenameModalComponent } from '../components/rename-modal/rename-modal';
 import {HttpModule} from "@angular/http";
 
 
 @NgModule({
   declarations: [
     MyApp,
-    RenameModalComponent
   ],
   imports: [
     BrowserModule,
@@ -27,7 +25,7 @@ import {HttpModule} from "@angular/http";
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp, RenameModalComponent
+    MyApp
   ],
   providers: [
     StatusBar,

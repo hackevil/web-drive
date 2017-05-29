@@ -30,7 +30,7 @@ export class User {
   }
 
   get allocated() {
-    return 10; //MB
+    return 500; //MB
   }
 
   get usage() {

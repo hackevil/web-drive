@@ -3,7 +3,7 @@ import 'rxjs/add/operator/map';
 import {ConnectionServiceProvider} from "../connection-service/connection-service";
 import {Observable} from "rxjs/Observable";
 
-import * as download from "in-browser-download";
+import { saveAs } from "file-saver";
 
 enum ItemType {
   FOLDER, FILE
@@ -223,10 +223,11 @@ export class DataServiceProvider {
     return Observable.create(observer => {
       this.connection.download(type + "/download/" + id).subscribe(
         result => {
+          const file = new Blob([result]);
           if (selectedItem.type === "file") {
-            download(result, selectedItem.name + "." + selectedItem.extension);
+            saveAs(file, selectedItem.name + "." + selectedItem.extension);
           } else {
-            download(result, selectedItem.name + ".zip");
+            saveAs(file, selectedItem.name + ".zip");
           }
           observer.next({success: true});
           observer.complete();

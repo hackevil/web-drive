@@ -1,14 +1,14 @@
 webpackJsonp([0],{
 
-/***/ 286:
+/***/ 284:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__drive__ = __webpack_require__(292);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__pipes_filter_filter__ = __webpack_require__(298);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(99);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__drive__ = __webpack_require__(290);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__pipes_filter_filter__ = __webpack_require__(296);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DrivePageModule", function() { return DrivePageModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -44,12 +44,12 @@ DrivePageModule = __decorate([
 
 /***/ }),
 
-/***/ 292:
+/***/ 290:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(99);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__providers_data_service_data_service__ = __webpack_require__(202);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_auth_service_auth_service__ = __webpack_require__(201);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return DrivePage; });
@@ -264,9 +264,15 @@ var DrivePage = (function () {
     DrivePage.prototype.downloadItem = function () {
         var _this = this;
         var selectedItem = this.selected.values().next().value;
+        this.startLoading();
         this.data.downloadItem(selectedItem).subscribe(function (result) {
-            if (result.success === true)
+            if (result.success === true) {
                 _this.data.clearSelected();
+            }
+            _this.stopLoading();
+            if (result.success === false) {
+                _this.displayWarning("Failed to download file.", "Please check your connection");
+            }
         });
     };
     DrivePage.prototype.shareItems = function () {
@@ -303,7 +309,7 @@ DrivePage = __decorate([
 
 /***/ }),
 
-/***/ 298:
+/***/ 296:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

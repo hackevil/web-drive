@@ -211,8 +211,15 @@ export class DrivePage {
 
   downloadItem() {
     const selectedItem = this.selected.values().next().value;
+    this.startLoading();
     this.data.downloadItem(selectedItem).subscribe(result => {
-      if (result.success === true) this.data.clearSelected();
+      if (result.success === true) {
+        this.data.clearSelected();
+      }
+      this.stopLoading();
+      if (result.success === false) {
+        this.displayWarning("Failed to download file.", "Please check your connection");
+      }
     });
   }
 
