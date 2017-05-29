@@ -30,11 +30,14 @@ class FileController extends Controller
         $user = $request->user();
         $files = Input::file('files');
         $folderId = $request->input("folderId");
-        $folderPath = "drive-" . $user->id;
+        $folderPathStorage = "drive-" . $user->id . "/storage";
+        $folderPathDownloads = "drive-" . $user->id . "/downloads";
+
         if ($folderId > -1) {
             $folder = Folder::find($folderId);
             if (!$folder) return response()->json(["status" => "fail"], 200);
-            $folderPath = $folderPath . $folder->path;
+            $folderPathStorage = $folderPathStorage . $folder->path;
+            $folderPathDownloads = $folderPathDownloads . $folder->path;
         }
 
         $count = count($files);
@@ -52,15 +55,17 @@ class FileController extends Controller
                 'audio/x-wav,image/gif,image/png,image/bmp,image/jpeg,text/html|max:50000');
             $validator = Validator::make(array('file'=> $file), $rules);
             if($validator->passes()) {
-                $path = Storage::putFile($folderPath, $file);
+                $fileName = uniqid() . "." . $file->getClientOriginalExtension();
+                Storage::putFileAs($folderPathDownloads, $file, $fileName);
+                Storage::putFileAs($folderPathStorage, $file, $fileName);
                 File::create([
-                    "name" => $file->getClientOriginalName(),
+                    "name" => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
                     "extension" => $file->getClientOriginalExtension(),
                     "size" => $file->getSize(),
                     "mimeType" => $file->getMimeType(),
                     "user_id" => $user->id,
                     "folder_id" => ($folderId < 0) ? null : $folderId,
-                    "path" => $path
+                    "path" => $fileName
                 ]);
                 $totalSize = ($totalSize + $file->getSize());
                 $uploaded++;
@@ -82,10 +87,11 @@ class FileController extends Controller
 
     public function download(Request $request, $fileId)
     {
-        $folderRoot = storage_path() . "/app/";
         $file = File::find($fileId);
         if ($file && ($file->user->id === $request->user()->id)) {
-            $filePath = $folderRoot . $file->path;
+            $parentFolder = $file->parentFolder;
+            $folderRoot = storage_path() . "/app/drive-" . $request->user()->id . "/downloads";
+            $filePath = $folderRoot . ($parentFolder ? $parentFolder->path : "") . "/" . $file->path;
             $headers = ['Content-Type' => $file->mimeType];
             return response()->download($filePath, $file->name . '.' . $file->extension,
                 $headers);
@@ -98,6 +104,15 @@ class FileController extends Controller
     {
         $file = File::withTrashed()->find($id);
         if ($file && ($file->user->id === $request->user()->id)) {
+            $parentFolder = $file->parentFolder;
+            $folderRoot = "drive-" . $request->user()->id;
+            $parentFolderPath = $parentFolder ? $parentFolder->path : "";
+            $folderPathDownloads = $folderRoot . "/downloads" . $parentFolderPath . "/" . $file->path;
+            $folderPathStorage = $folderRoot . "/storage" . $parentFolderPath . "/" . $file->path;
+            $relativePathAppend = storage_path() . "/app/";
+            if (!file_exists($relativePathAppend . $folderPathDownloads)) {
+                Storage::copy($folderPathStorage, $folderPathDownloads);
+            }
             $file->restore();
             return response()->json(["status" => "success"],200);
         } else {
@@ -109,6 +124,11 @@ class FileController extends Controller
     {
         $file = File::find($id);
         if ($file && ($file->user->id === $request->user()->id)) {
+            $parentFolder = $file->parentFolder;
+            $parentFolderPath = $parentFolder ? $parentFolder->path : "";
+            $folderRoot = "drive-" . $request->user()->id . "/downloads";
+            $filePath = $folderRoot . $parentFolderPath . "/" . $file->path;
+            Storage::delete($filePath);
             $file->delete();
             return response()->json(["status" => "success"],200);
         } else {

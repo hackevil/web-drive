@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Folder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FolderController extends Controller
 {
@@ -45,12 +46,12 @@ class FolderController extends Controller
         $userId = $request->user()->id;
 
         if ($folder && ($folder->user->id === $userId)) {
-            $folderRoot = storage_path() . "/app/drive-" . $userId;
+            $folderRoot = storage_path() . "/app/drive-" . $userId . "/downloads";
             $folderPath = $folderRoot . $folder->path . '/';
             $tempPath = $folderRoot . uniqid('/temp/temp-') . '.zip';
             $zippedFolder = $zipper->make($tempPath);
 
-            if (is_dir($folderPath)) {
+            if (is_dir($folderPath) && ((count($folder->folders) > 0) || (count($folder->files) > 0))) {
                 $zippedFolder->add($folderPath)->close();
             } else {
                 $zippedFolder->addString("empty.txt", "This folder is empty.")->close();
@@ -80,7 +81,18 @@ class FolderController extends Controller
     public function restore(Request $request, $id)
     {
         $folder = Folder::withTrashed()->find($id);
-        if ($folder && ($folder->user->id === $request->user()->id)) {
+        $user = $request->user();
+        if ($folder && ($folder->user->id === $user->id)) {
+            $folderPathDownloads = "drive-" . $user->id . "/downloads" . $folder->path;
+            $folderPathStorage = "drive-" . $user->id . "/storage" . $folder->path;
+            $relativePathAppend = storage_path() . "/app/";
+            if (is_dir($relativePathAppend . $folderPathDownloads)) {
+                if (!Storage::deleteDirectory($folderPathDownloads)) {
+                    return response()->json(["status" => "error"], 200);
+                }
+            }
+            $this->copy_directory($relativePathAppend . $folderPathStorage,
+                $relativePathAppend . $folderPathDownloads);
             $folder->restore();
             return response()->json(["status" => "success"],200);
         } else {
@@ -91,11 +103,37 @@ class FolderController extends Controller
     public function destroy(Request $request, $id)
     {
         $folder = Folder::find($id);
-        if ($folder && ($folder->user->id === $request->user()->id)) {
+        $user = $request->user();
+        if ($folder && ($folder->user->id === $user->id)) {
+            $folderPathDownloads = "drive-" . $user->id . "/downloads" . $folder->path . "/";
+            $relativePath = storage_path() . "/app/" . $folderPathDownloads;
+            if (is_dir($relativePath)) {
+                if (!Storage::deleteDirectory($folderPathDownloads)) {
+                    return response()->json(["status" => "error"], 200);
+                }
+            }
             $folder->delete();
             return response()->json(["status" => "success"],200);
         } else {
             return response()->json(["status" => "error"], 200);
         }
+    }
+
+    private function copy_directory($src_directory, $dst_directory)
+    {
+        $dir = opendir($src_directory);
+        @mkdir($dst_directory);
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                if ( is_dir($src_directory . '/' . $file) ) {
+                    $this->copy_directory($src_directory . '/' .
+                        $file,$dst_directory . '/' . $file);
+                }
+                else {
+                    copy($src_directory . '/' . $file,$dst_directory . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
     }
 }
